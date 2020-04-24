@@ -1,28 +1,28 @@
-# OSDG
-A tool to assign Sustainable Development Goals to a scientific abstracts.
+#!/usr/bin/env python3
+# -*- coding: utf-8 -*-
+"""
+Created on Fri Apr  3 18:37:11 2020
 
-## Usage
+@author: lukas-pkl
+"""
 
-The tool is uploaded to the Docker Hub repository. To dowload the docker image :
+"""
+To use the API, please download and run the docker conatiner
 
-```bash 
+in bash :
+
 docker pull technoteai/osdg
-```
+docker run --name my-open-sdg -p 5000:5000 technoteai/osdg:lattest
 
-Then run the dowloaded docker image
 
- ```bash 
- docker run --name my-open-sdg -p 5000:5000 technoteai/osdg:lattest
- ```
+"""
 
-The container takes about a minute to fully start.Once it does, it will be running on port 5000. Please go to :
 
-[http://localhost:5000/](http://localhost:5000/)
 
-or try the following pyhon query 
 
-```python
 import requests 
+
+
 
 data = { 'query': """Using satellite data on deforestation and weather in Malawi and 
         linking those datasets with household survey datasets, we estimate the causal 
@@ -40,7 +40,7 @@ data = { 'query': """Using satellite data on deforestation and weather in Malawi
         effect on access to clean drinking water as that of a 9% decrease in rainfall.
         """ }
 
-response = requests.post('http://localhost:5000/', data=data)
 
-print( response.text )
-```
+response = requests.post('http://localhost:5000/search', data=data)
+
+result = response.text

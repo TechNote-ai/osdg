@@ -1,0 +1,5 @@
+
+
+
+#To use the API you will need to have docker installed on your system. 
+#See instructions how to install docker on your operating system: https://docs.docker.com/get-docker/ 
