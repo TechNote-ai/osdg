@@ -6,7 +6,14 @@ A tool to assign Sustainable Development Goals to a scientific abstracts.
 
 ## Usage
 
-The tool is uploaded to the Docker Hub repository. To dowload the docker image :
+The tool is uploaded to the Docker Hub repository. If you do not have docker installed on your system, please visit [Docker page](https://docs.docker.com/get-docker/) and follow the instructions to install docker on your OS. 
+
+To check docker instalation:
+```bash
+docker --version
+```
+
+To dowload the docker image :
 
 ```bash 
 docker pull technoteai/osdg
