@@ -1,6 +1,6 @@
 
 ![OSDG Logo](/images/OSDG.png)
-Format: ![Alt Text](url)
+
 
 A tool to assign Sustainable Development Goals to a scientific abstracts.
 
