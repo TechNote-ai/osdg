@@ -10,7 +10,7 @@ The ontology of terms used in the O-SDG Tool is derived from the following data 
 | 3. | Concepts extracted from SDG Pathfinder documents extracted via ML | 3_SDGPathfiner_DocumentConcepts | [Document Colletion](https://sdg-pathfinder.org/) ; [Modelling Description](https://ppmi.lt/)  |
 | 4. | Keywords from SDG Pathfinder indicated by the SDG Pathfinder tool itself| 4_SDGPathfinder_Keywords| [SDG Pathfinder](https://sdg-pathfinder.org/) | 
 | 5. | Concepts UN Linked SDG tool extracted from Administrative Documents | 5_LinkedSDG_DocumentExtracts | [Link to LinkedSGS Tool](http://linkedsdg.apps.officialstatistics.org/#/) |
-
+| 6. | Terms by Indicator from SDGIO Ontology | 6_SDGIO_Terms | [Link to SDGIO GitHub ](https://github.com/SDG-InterfaceOntology/sdgio) |
 
 # General Ontology Construction Procedure
 
