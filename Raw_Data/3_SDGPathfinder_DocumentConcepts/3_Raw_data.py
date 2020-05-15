@@ -86,6 +86,25 @@ for key , value in sdg_words_raw.items() :
     sdg_words[ key ] = plh
 
 #%%
+bad_sdg3_terms = set( [ "data type" , 
+                      "date signature" , 
+                      "date start" , 
+                      "date start date" , 
+                      "deliverable list" , 
+                      "deliverable wp" , 
+                      "demonstrator dissemination" , 
+                      "description deliverable" , 
+                      "developed new" , 
+                      "development new" , 
+                      "dissemination activities" , 
+                      "dissemination report" , 
+                      "document version" , 
+                      "ec contribution" ] )
+
+sdg3_plh = [ i for i in sdg_words["SDG_3"] if i not in bad_sdg3_terms] 
+sdg_words[ "SDG_3" ] = sdg3_plh
+
+#%%
 js = json.dumps( sdg_words )
 file = open( "3_ProcessedKeyTerms.json" , "w")
 file.write( js )
