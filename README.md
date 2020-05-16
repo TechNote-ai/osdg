@@ -50,7 +50,7 @@ data = { 'query': """Using satellite data on deforestation and weather in Malawi
         effect on access to clean drinking water as that of a 9% decrease in rainfall.
         """ }
 
-response = requests.post('http://localhost:5000/', data=data)
+response = requests.post('http://localhost:5000/search', data=data)
 
 print( response.text )
 ```
