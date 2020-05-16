@@ -96,20 +96,39 @@ def levenshtein_ratio(s, t):
     # Computation of the Levenshtein Distance Ratio
     Ratio = ((len(s)+len(t)) - distance[row][col]) / (len(s)+len(t))
     return Ratio
- 
+
+def process_fosname( string ):
+    """Function to normalize FOS names """
+    good_chars = "abcdefghijklmnoprstuvwxyz0123456789 "
+    string = string.lower()
+    string = string.replace("-" , " ")
+    string = "".join(i for i in string if i in good_chars)
+    string = string.replace("  ", " ")
+    if string[-1]== " " :
+        string = string[:-1]
+    if string[0]== " " :
+        string = string[1:]
+    return string
+    
+    
+    
 #%%
 #Loading a file for FOS mapping
 file = open( "FOSMAP.json" , "r")
 fos_map = json.loads( file.read())
 file.close()
 
-all_fos = { v : k for k,v in fos_map.items() } 
+all_fos = { process_fosname(v) : k for k,v in fos_map.items() } 
     
 #%%
 
 file = open("CombinedOntology.json" , "r")
 sdg_keywords = json.loads( file.read() )
 file.close()    
+
+#Number of terms in ontology
+
+number = sum([len(i) for i in list(sdg_keywords.values())])
 
 #%%
 """
@@ -134,7 +153,7 @@ for key , value in sdg_keywords.items() :
         plh3 = []
         plh4 = []
         for key3 in list(all_fos.keys()) :
-            if all(p in key3 for p in parts ) and levenshtein_ratio( key2 , key3 ) > 0.88  :
+            if all(p in key3 for p in parts ) and levenshtein_ratio( key2 , key3 ) > 0.85  :
                 plh3.append( all_fos[ key3 ])
                 plh4.append( key3 )
                 
@@ -158,14 +177,7 @@ js = json.dumps( sdg_fos )
 file = open("SDGFosIDs.json" , "w")
 file.write( js )
 file.close()
-#%%
-for key , value in sdg_fos_s.items() :
-    c = 0
-    for v in list( value.values() ) :
-        if v == [] :
-            c+=1
-    
-    print( key , 100 - int( c * 100 / len(value)) , "%")
+
     
 #%%
 f_sdg_fos = {}
@@ -176,6 +188,16 @@ for key , value in sdg_fos.items() :
         plh +=  v["matchedFOS"]
     plh = list(set( plh ))
     f_sdg_fos[ key ] = plh
+    
+#%%
+for key , value in sdg_fos_s.items() :
+    c = 0
+    for v in list( value.values() ) :
+        if v["matchedFOS"] == [] :
+            c+=1
+    
+    print( key , 100 - int( c * 100 / len(value)) , "%")
+#%%
     
 js = json.dumps( f_sdg_fos )
 file = open( "SDGFos.json" , "w")
