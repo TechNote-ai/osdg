@@ -2,13 +2,13 @@
 ![OSDG Logo](/images/OSDG.png)
 
 
-A tool to assign Sustainable Development Goals to a scientific abstracts.
+A tool to assign Sustainable Development Goals to a scientific abstracts or summaries of policy documents.
 
 ## Usage
 
 The tool is uploaded to the Docker Hub repository. If you do not have docker installed on your system, please visit [Docker page](https://docs.docker.com/get-docker/) and follow the instructions to install docker on your OS. 
 
-To check docker instalation:
+To check docker instalation run the following command on the terminal on your machine:
 ```bash
 docker --version
 ```
@@ -25,7 +25,13 @@ Then run the dowloaded docker image
  docker run --name my-osdg -p 5000:5000 --detach technoteai/osdg:latest
  ```
 
-The container takes about a minute to fully start.Once it does, it will be running on port 5000. Please go to :
+The container takes about a minute to fully start.Once it does, it will be running on port 5000. 
+To verify that the conatiner has started and works, enter the following :
+
+```bash 
+docker ps 
+```
+If the conatiner runs OK, please go to :
 
 [http://localhost:5000/](http://localhost:5000/)
 
