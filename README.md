@@ -22,7 +22,7 @@ docker pull technoteai/osdg
 Then run the dowloaded docker image
 
  ```bash 
- docker run --name my-open-sdg -p 5000:5000 technoteai/osdg:lattest
+ docker run --name my-osdg -p 5000:5000 --detach technoteai/osdg:latest
  ```
 
 The container takes about a minute to fully start.Once it does, it will be running on port 5000. Please go to :
