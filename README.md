@@ -25,7 +25,7 @@ Then run the dowloaded docker image
  docker run --name my-osdg -p 5000:5000 --detach technoteai/osdg:latest
  ```
 
-The container takes about a minute to fully start.Once it does, it will be running on port 5000. 
+The container takes about 2 minutes to fully start.Once it does, it will be running on port 5000. 
 To verify that the conatiner has started and works, enter the following :
 
 ```bash 
