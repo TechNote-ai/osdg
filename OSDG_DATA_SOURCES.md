@@ -12,6 +12,7 @@ The ontology of terms used in the O-SDG Tool is derived from the following data 
 | 5. | Concepts UN Linked SDG tool extracted from Administrative Documents | 5_LinkedSDG_DocumentExtracts | [Link to LinkedSGS Tool](http://linkedsdg.apps.officialstatistics.org/#/) |
 | 6. | Terms by Indicator from SDGIO Ontology | 6_SDGIO_Terms | [Link to SDGIO GitHub ](https://github.com/SDG-InterfaceOntology/sdgio) |
 | 7. | Concepts linked to SDGs from EC Policy Documents | 7_EC_Policy_Doc_Terms | Skrynik & Stanciauskas ( 2020 upcoming ) | 
+| 8. | FOS'es Linked to NABs Areas | 8_NABS_FOS | [Link to Eurostat](https://ec.europa.eu/eurostat/ramon/nomenclatures/index.cfm?TargetUrl=LST_NOM_DTL&StrNom=CEPA_1994&StrLanguageCode=EN&IntPcKey=4431590&StrLayoutCode=HIERARCHIC) |
 
 # General Ontology Construction Procedure
 
