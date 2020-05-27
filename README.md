@@ -1,5 +1,3 @@
-
-#![OSDG Logo](/images/OSDG.png){:height="36px" width="36px"}.
 <img src="/images/OSDG.png" alt="OSDG_Logo" width="200"/>
 
 OSDG is an open-source tool that assigns labels to scientific content based on Sustainable Development Goals (SDGs).
