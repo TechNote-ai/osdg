@@ -10,49 +10,49 @@ import json
 from tqdm import tqdm
 import numpy as np
 
-sws = set(['ourselves', 'should', 'often', 'does', 'this', 'beside', 'well', 
-        'among', 'throughout', 'being', 'become', 'yourselves', 'namely', 
-        'whom', 'nothing', 'thus', 'many', '’re', 'had', 'somewhere', 'made', 
-        'still', "'re", 'eight', 'of', 'yours', 'further', 'again', 'by', 
-        'anyhow', 'whenever', 'both', 'first', 'third', 'whither', 'all', 
+sws = set(['ourselves', 'should', 'often', 'does', 'this', 'beside', 'well',
+        'among', 'throughout', 'being', 'become', 'yourselves', 'namely',
+        'whom', 'nothing', 'thus', 'many', '’re', 'had', 'somewhere', 'made',
+        'still', "'re", 'eight', 'of', 'yours', 'further', 'again', 'by',
+        'anyhow', 'whenever', 'both', 'first', 'third', 'whither', 'all',
         'whether', 'amount', 'afterwards', 'alone', 'she', 'where', 'seemed',
-        'something', 'mine', 'whatever', 'most', 'doing', 'behind', 
-        'thereupon', 'whole', 'hers', 'ca', 'a', 'before', 'forty', '’d', 
-        '‘s', 'three', 'anything', 'via', 'hereafter', 'him', 'as', 'those', 
-        'here', 'around', '’ve', 'much', 'some', 'whereas', 'several', 'has', 
-        'done', 'besides', 'am', 'hereby', '‘d', 'yet', 'make', 'none', 
-        'while', 'just', 'towards', 'sometimes', 'his', 'into', 'various', 
-        'their', 'thence', 'so', 'either', 'about', 'once', 'onto', 'thru', 
-        "'m", 'one', 'seems', 'between', 'say', 'mostly', 'otherwise', 
-        'herself', 'might', 'and', 'least', 'did', 'hence', 'any', 'do', 
-        'each', 'whereupon', 'becoming', 'thereby', "'ll", 'two', 'yourself', 
+        'something', 'mine', 'whatever', 'most', 'doing', 'behind',
+        'thereupon', 'whole', 'hers', 'ca', 'a', 'before', 'forty', '’d',
+        '‘s', 'three', 'anything', 'via', 'hereafter', 'him', 'as', 'those',
+        'here', 'around', '’ve', 'much', 'some', 'whereas', 'several', 'has',
+        'done', 'besides', 'am', 'hereby', '‘d', 'yet', 'make', 'none',
+        'while', 'just', 'towards', 'sometimes', 'his', 'into', 'various',
+        'their', 'thence', 'so', 'either', 'about', 'once', 'onto', 'thru',
+        "'m", 'one', 'seems', 'between', 'say', 'mostly', 'otherwise',
+        'herself', 'might', 'and', 'least', 'did', 'hence', 'any', 'do',
+        'each', 'whereupon', 'becoming', 'thereby', "'ll", 'two', 'yourself',
         'these', 'through', 'four', "'s", 'last', 'on', 'along', 'could',
-        "n't", 'front', 'not', 'quite', '’m', 'at', 'he', 'ten', 'very', 
-        'himself', 'although', 'now', 'it', 'move', 'bottom', 'within', 
-        'can', 'sometime', 'out', 'elsewhere', 'empty', 'such', 'after', 
-        'seeming', 'put', 'us', 'upon', 'please', 'used', 'except', 'n‘t', 
-        'ours', 'six', 'though', 'without', 'why', 'however', 'above', 
-        'herein', 'else', 'them', 'formerly', 'since', 'take', 'beyond', 
-        'whence', 'n’t', 'been', 'nor', 'wherever', 'everywhere', 'hundred', 
-        'but', 'latterly', 'really', 'is', 'with', 'hereupon', 'we', 
-        'someone', 'whereby', 'in', 'because', 'latter', 'eleven', 'serious', 
-        'twenty', 'name', 'may', 'itself', 'to', 'there', "'ve", 'whereafter', 
-        'ever', 'perhaps', 'everyone', 'sixty', 'seem', 'which', 'almost', 
-        'anywhere', 'the', 'wherein', 'its', 'cannot', 'keep', 'twelve', 
-        'moreover', 'they', 'more', 'regarding', 'next', 'you', 'your', 
-        'own', 'enough', 'side', 're', 'neither', 'have', 'during', 'under', 
-        'will', 'would', 'over', 'therein', 'became', 'beforehand', 'using', 
-        'part', 'my', 'that', 'themselves', '’ll', 'myself', 'somehow', 
-        'together', 'top', 'from', 'then', 'are', 'give', 'back', 'less', 
-        'always', 'never', 'becomes', 'until', "'d", 'go', 'i', 'whose', 
-        'below', 'former', 'our', 'be', 'even', 'due', 'fifteen', 'every', 
-        'than', 'rather', 'how', 'an', 'across', '‘ve', 'another', 'must', 
-        'noone', 'against', '’s', 'others', 'per', 'already', 'off', 'too', 
+        "n't", 'front', 'not', 'quite', '’m', 'at', 'he', 'ten', 'very',
+        'himself', 'although', 'now', 'it', 'move', 'bottom', 'within',
+        'can', 'sometime', 'out', 'elsewhere', 'empty', 'such', 'after',
+        'seeming', 'put', 'us', 'upon', 'please', 'used', 'except', 'n‘t',
+        'ours', 'six', 'though', 'without', 'why', 'however', 'above',
+        'herein', 'else', 'them', 'formerly', 'since', 'take', 'beyond',
+        'whence', 'n’t', 'been', 'nor', 'wherever', 'everywhere', 'hundred',
+        'but', 'latterly', 'really', 'is', 'with', 'hereupon', 'we',
+        'someone', 'whereby', 'in', 'because', 'latter', 'eleven', 'serious',
+        'twenty', 'name', 'may', 'itself', 'to', 'there', "'ve", 'whereafter',
+        'ever', 'perhaps', 'everyone', 'sixty', 'seem', 'which', 'almost',
+        'anywhere', 'the', 'wherein', 'its', 'cannot', 'keep', 'twelve',
+        'moreover', 'they', 'more', 'regarding', 'next', 'you', 'your',
+        'own', 'enough', 'side', 're', 'neither', 'have', 'during', 'under',
+        'will', 'would', 'over', 'therein', 'became', 'beforehand', 'using',
+        'part', 'my', 'that', 'themselves', '’ll', 'myself', 'somehow',
+        'together', 'top', 'from', 'then', 'are', 'give', 'back', 'less',
+        'always', 'never', 'becomes', 'until', "'d", 'go', 'i', 'whose',
+        'below', 'former', 'our', 'be', 'even', 'due', 'fifteen', 'every',
+        'than', 'rather', 'how', 'an', 'across', '‘ve', 'another', 'must',
+        'noone', 'against', '’s', 'others', 'per', 'already', 'off', 'too',
         'was', 'when', 'also', 'other', 'therefore', 'see', 'up', 'indeed',
-        'what', '‘re', 'down', 'nobody', 'everything', 'whoever', 'five', 
-        'me', 'nevertheless', 'toward', 'same', 'meanwhile', 'call', 'if', 
-        'anyone', 'or', 'nowhere', 'were', 'unless', 'get', 'nine', 'her', 
-        'for', '‘ll', 'who', 'fifty', 'few', 'only', 'anyway', 'no', 
+        'what', '‘re', 'down', 'nobody', 'everything', 'whoever', 'five',
+        'me', 'nevertheless', 'toward', 'same', 'meanwhile', 'call', 'if',
+        'anyone', 'or', 'nowhere', 'were', 'unless', 'get', 'nine', 'her',
+        'for', '‘ll', 'who', 'fifty', 'few', 'only', 'anyway', 'no',
         'amongst', 'show', '‘m', 'full', 'thereafter'])
 #%%
 
@@ -78,7 +78,7 @@ def levenshtein_ratio(s, t):
             distance[i][0] = i
             distance[0][k] = k
 
-    # Iterate over the matrix to compute the cost of deletions,insertions and/or substitutions    
+    # Iterate over the matrix to compute the cost of deletions,insertions and/or substitutions
     for col in range(1, cols):
         for row in range(1, rows):
             if s[row-1] == t[col-1]:
@@ -109,22 +109,22 @@ def process_fosname( string ):
     if string[0]== " " :
         string = string[1:]
     return string
-    
-    
-    
+
+
+
 #%%
 #Loading a file for FOS mapping
 file = open( "FOSMAP.json" , "r")
 fos_map = json.loads( file.read())
 file.close()
 
-all_fos = { process_fosname(v) : k for k,v in fos_map.items() } 
-    
+all_fos = { process_fosname(v) : k for k,v in fos_map.items() }
+
 #%%
 
 file = open("CombinedOntology.json" , "r")
 sdg_keywords = json.loads( file.read() )
-file.close()    
+file.close()
 
 #Number of terms in ontology
 
@@ -134,8 +134,8 @@ number = sum([len(i) for i in list(sdg_keywords.values())])
 """
 Matching with Fields of Study from MS Academic (v10-10-2019)
 Match criteria:
-    all tokens from a concept must be present in FOS name 
-    concept must constitute at least 50% of FOS name
+    all tokens from a concept must be present in FOS name
+    levenstein similarity between concept and FOS name must be > 0.85
 """
 
 sdg_fos = {}
@@ -156,17 +156,17 @@ for key , value in sdg_keywords.items() :
             if all(p in key3 for p in parts ) and levenshtein_ratio( key2 , key3 ) > 0.85  :
                 plh3.append( all_fos[ key3 ])
                 plh4.append( key3 )
-                
+
         plh[ key2 ] = { "sources" : value2 ,
                            "matchedFOS" : plh3 }
         plh2[ key2 ] = { "sources" : value2 ,
                            "matchedFOS" : plh4 }
-            
+
 
 
     sdg_fos[key] = plh
     sdg_fos_s[key] = plh2
-    
+
 #%%
 js = json.dumps( sdg_fos_s )
 file = open("SDGFosNames.json" , "w")
@@ -178,7 +178,7 @@ file = open("SDGFosIDs.json" , "w")
 file.write( js )
 file.close()
 
-    
+
 #%%
 f_sdg_fos = {}
 
@@ -188,21 +188,21 @@ for key , value in sdg_fos.items() :
         plh +=  v["matchedFOS"]
     plh = list(set( plh ))
     f_sdg_fos[ key ] = plh
-    
+
 #%%
 for key , value in sdg_fos_s.items() :
     c = 0
     for v in list( value.values() ) :
         if v["matchedFOS"] == [] :
             c+=1
-    
+
     print( key , 100 - int( c * 100 / len(value)) , "%")
 #%%
-    
+print("Final FOS Count:")
+for key , value in f_sdg_fos.items() :
+    print(key , " - " , len(value))
+
 js = json.dumps( f_sdg_fos )
 file = open( "SDGFos.json" , "w")
 file.write( js )
 file.close()
-        
-
-
