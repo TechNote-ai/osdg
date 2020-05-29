@@ -53,7 +53,7 @@ file.close()
 map = {'Protection of atmosphere and climate' : "SDG_13",
         'Protection of ambient air': "SDG_11",
         'Solid waste': "SDG_11",
-        'Protection of ambient water' : "SDG_14",
+        'Protection of ambient water' : "SDG_6",
         'Protection of soil and groundwater' : "SDG_6",
         'Noise and vibration' : "SDG_11",
         'Protection of species and habitats' : "SDG_15",
