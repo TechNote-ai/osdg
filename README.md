@@ -7,6 +7,8 @@ A version of the OSDG tool is available at [OSDG website](https://technote.ai/os
 2) multiple DOIs in one CSV file,
 3) a text fragment.
 
+**Check out our paper on ArXiv [OSDG -- Open-Source Approach to Classify Text Data by UN Sustainable Development Goals (SDGs)](https://arxiv.org/abs/2005.14569)**
+
 A smaller version of the tool to classify text fragments is available at [Technote Docker Hub](https://hub.docker.com/r/technoteai/osdg) repository.
 
 ## Usage
