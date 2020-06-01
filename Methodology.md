@@ -25,7 +25,7 @@ OSDG processes user queries in the following steps:
 Head to theSearchpage to put our methodology to practical use. If you see something thatrequires improvement or you would like to contact our data team, please state your enquiryusing ourcontact form.
 ## References and inspiration
 
-The list of data sources used in the current version of the OSDG Tool are [here](https://raw.githubusercontent.com/TechNote-ai/osdg/master/OSDG_DATA_SOURCES.md). OSDG leverages the data from [Microsoft Academic](https://academic.microsoft.com/home):
+The list of data sources used in the current version of the OSDG Tool are [here](https://github.com/TechNote-ai/osdg/blob/master/OSDG_DATA_SOURCES.md). OSDG leverages the data from [Microsoft Academic](https://academic.microsoft.com/home):
 
 1) Sinha, A., Shen, Z., Song, Y., Ma, H., Eide, D., Hsu, B.-J. & Wang, K. (2015). AnOverview of Microsoft Academic Service (MAS) and Applications. Proceedings of the24th International Conference on World Wide Web (p./pp. 243--246), Republic andCanton of Geneva, Switzerland: International World Wide Web Conferences SteeringCommittee. ISBN: 978-1-4503-3473-0. doi:10.1145/2740908.27428398.
 2) Wang, K., Shen, Z., Huang, C., Wu, C., Eide, D., Dong, Y., Qian, J., Kanakia, A., Chen,A.C., & Rogahn, R. (2019). A Review of Microsoft Academic Services for Science ofScience Studies. Frontiers in Big Data, 2. doi:10.3389/FDATA.2019.00045
