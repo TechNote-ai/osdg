@@ -56,19 +56,20 @@ map = {'Protection of atmosphere and climate' : "SDG_13",
         'Protection of ambient water' : "SDG_6",
         'Protection of soil and groundwater' : "SDG_6",
         'Noise and vibration' : "SDG_11",
-        'Protection of species and habitats' : "SDG_15",
+        # 'Protection of species and habitats' : "SDG_15",  #This cannot be assigned to any SDG as a whole
         'Protection against natural hazards' : "SDG_11",
         'Radioactive pollution' : "SDG_11" }
 
 sdg_words_raw = {}
 
 for key , value in input_data.items() :
-    sdg = map[ key ]
-    if sdg not in sdg_words_raw.keys() :
-        sdg_words_raw[ sdg ] = []
-    plh = [fos_map[i] for i in value if i in fos_map.keys()]
+    if key in map :
+        sdg = map[ key ]
+        if sdg not in sdg_words_raw.keys() :
+            sdg_words_raw[ sdg ] = []
+        plh = [fos_map[i] for i in value if i in fos_map.keys()]
 
-    sdg_words_raw[ sdg ] += plh
+        sdg_words_raw[ sdg ] += plh
 
 counter = 0
 print("Key Words Identified before cleaning : " )
