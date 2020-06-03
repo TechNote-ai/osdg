@@ -11,7 +11,7 @@ The ontology of terms used in the O-SDG Tool is derived from the following data 
 | 4. | Keywords from SDG Pathfinder indicated by the SDG Pathfinder tool itself| 4_SDGPathfinder_Keywords| [SDG Pathfinder](https://sdg-pathfinder.org/) | 
 | 5. | Concepts UN Linked SDG tool extracted from Administrative Documents | 5_LinkedSDG_DocumentExtracts | [Link to LinkedSGS Tool](http://linkedsdg.apps.officialstatistics.org/#/) |
 | 6. | Terms by Indicator from SDGIO Ontology | 6_SDGIO_Terms | [Link to SDGIO GitHub ](https://github.com/SDG-InterfaceOntology/sdgio) |
-| 7. | Concepts linked to SDGs from EC Policy Documents | 7_EC_Policy_Doc_Terms | Skrynik & Stanciauskas ( 2020 upcoming ) | 
+| 7. | Concepts linked to SDGs from EC Policy Documents | 7_EC_Policy_Doc_Terms | Skrynnyk & Stanciauskas ( 2020 upcoming ) | 
 | 8. | FOS'es Linked to NABs Areas | 8_NABS_FOS | [Link to Eurostat](https://ec.europa.eu/eurostat/ramon/nomenclatures/index.cfm?TargetUrl=LST_NOM_DTL&StrNom=CEPA_1994&StrLanguageCode=EN&IntPcKey=4431590&StrLayoutCode=HIERARCHIC) |
 | 9. | Keywords from "Science4SDGs" project | 9_SIRIS_Science4SDGs | [Link to "Science4SDGs" project](http://science4sdgs.sirisacademic.com/) |
 | 10. | A boost of SDG relevant FOS'es compiled by PPMI researchers | 10_PPMI_boost | [PPMI](https://ppmi.lt)|
