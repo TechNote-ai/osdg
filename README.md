@@ -13,6 +13,8 @@ A smaller version of the tool to classify text fragments is available at [Techno
 
 ## Usage
 
+**NB! We recommend to run OSDG on a machine with at least 24 GB RAM. The tool may not start properly on a smaller machine.**
+
 The tool is uploaded to the Docker Hub repository. If you do not have docker installed on your system, please visit [Docker page](https://docs.docker.com/get-docker/) and follow the instructions to install docker on your OS.
 
 To check docker installation run the following command on the terminal on your machine:
