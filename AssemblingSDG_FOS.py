@@ -114,21 +114,17 @@ def process_fosname( string ):
 
 #%%
 #Loading a file for FOS mapping
-file = open( "FOSMAP.json" , "r")
-fos_map = json.loads( file.read())
-file.close()
-
-all_fos = { process_fosname(v) : k for k,v in fos_map.items() }
+with open( "FOSMAP.json" , "r") as file_:
+    fos_map = json.loads( file_.read() )
+fosmap_r = { process_fosname(name) : id_ for id_, name in fos_map.items() }
 
 #%%
 
-file = open("CombinedOntology.json" , "r")
-sdg_keywords = json.loads( file.read() )
-file.close()
+with open("CombinedOntology.json" , "r") as file_:
+    sdg_keywords = json.loads( file_.read() )
 
 #Number of terms in ontology
-
-number = sum([len(i) for i in list(sdg_keywords.values())])
+number = sum(len(i) for i in list(sdg_keywords.values()))
 
 #%%
 """
@@ -138,71 +134,60 @@ Match criteria:
     levenstein similarity between concept and FOS name must be > 0.85
 """
 
-sdg_fos = {}
-sdg_fos_s = {}
+sdg_fos_ids = {}
+sdg_fos_names = {}
 
-for key , value in sdg_keywords.items() :
+for sdg_label, keywords in sdg_keywords.items() :
     print()
-    print("Processing ", key)
+    print("Processing ", sdg_label)
     print()
 
-    plh = {}
-    plh2 = {}
-    for key2 , value2 in tqdm(list(value.items())) :
-        parts = [ i for i in key2.split() if i not in sws ]
-        plh3 = []
-        plh4 = []
-        for key3 in list(all_fos.keys()) :
-            if all(p in key3 for p in parts ) and levenshtein_ratio( key2 , key3 ) > 0.85  :
-                plh3.append( all_fos[ key3 ])
-                plh4.append( key3 )
+    sdg_matched_ids, sdg_matched_names = {}, {}
 
-        plh[ key2 ] = { "sources" : value2 ,
-                           "matchedFOS" : plh3 }
-        plh2[ key2 ] = { "sources" : value2 ,
-                           "matchedFOS" : plh4 }
+    for keyword , sources in tqdm(list(keywords.items())) :
+        matches_fos_ids, matched_fos_names = [], []
 
+        keyword_parts = list(filter(lambda w: w not in sws, keyword.split()))
+        for fos_name, fos_id in list(fosmap_r.items()) :
+            if all(p in fos_name for p in keyword_parts ) and levenshtein_ratio( keyword , fos_name ) > 0.85 :
+                matches_fos_ids.append( fos_id )
+                matched_fos_names.append( fos_name )
 
+        sdg_matched_ids[ keyword ] = {
+            "sources" : sources, 
+            "matchedFOS" : matches_fos_ids 
+            }
+        sdg_matched_names[ keyword ] = { 
+            "sources" : sources,
+            "matchedFOS" : matched_fos_names 
+            }
 
-    sdg_fos[key] = plh
-    sdg_fos_s[key] = plh2
+    sdg_fos_ids[ sdg_label ] = sdg_matched_ids
+    sdg_fos_names[ sdg_label ] = sdg_matched_names
 
 #%%
-js = json.dumps( sdg_fos_s )
-file = open("SDGFosNames.json" , "w")
-file.write( js )
-file.close()
+with open("SDGFosIDs.json" , "w") as file_:
+    file_.write( json.dumps( sdg_fos_ids ) )
 
-js = json.dumps( sdg_fos )
-file = open("SDGFosIDs.json" , "w")
-file.write( js )
-file.close()
-
+with open("SDGFosNames.json" , "w") as file_:
+    file_.write( json.dumps( sdg_fos_names ) )
 
 #%%
 f_sdg_fos = {}
-
-for key , value in sdg_fos.items() :
-    plh = []
-    for v in list(value.values()) :
-        plh +=  v["matchedFOS"]
-    plh = list(set( plh ))
-    f_sdg_fos[ key ] = plh
+for sdg_label, sdg_fos_data in sdg_fos_ids.items() :
+    foses = []
+    for fos_data in list(sdg_fos_data.values()) :
+        foses += fos_data["matchedFOS"]
+    f_sdg_fos[ sdg_label ] = list(set( foses ))
 
 #%%
-for key , value in sdg_fos_s.items() :
-    c = 0
-    for v in list( value.values() ) :
-        if v["matchedFOS"] == [] :
-            c+=1
-
-    print( key , 100 - int( c * 100 / len(value)) , "%")
+for sdg_label, sdg_fos_data in sdg_fos_ids.items() :
+    c = sum(fos_data["matchedFOS"] == [] for fos_data in sdg_fos_data.values())
+    print( sdg_label , 100 - int( c * 100 / len(sdg_fos_data)) , "%")
 #%%
 print("Final FOS Count:")
-for key , value in f_sdg_fos.items() :
-    print(key , " - " , len(value))
+for sdg_label , foses in f_sdg_fos.items() :
+    print(sdg_label, " - ", len(foses))
 
-js = json.dumps( f_sdg_fos )
-file = open( "SDGFos.json" , "w")
-file.write( js )
-file.close()
+with open("SDGFos.json" , "w") as file_:
+    file_.write( json.dumps( f_sdg_fos ) )
