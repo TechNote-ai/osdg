@@ -13,7 +13,7 @@ import os
 
 import ast
 
-FNAME_PROCESSED_KEY_TERMS = "10_ProcessedKeyTerms.json"
+FNAME_PROCESSED_KEY_TERMS = "11_ProcessedKeyTerms.json"
 
 number_map = {"1" : "SDG_1" ,
             "2" : "SDG_2",
