@@ -189,5 +189,29 @@ print("Final FOS Count:")
 for sdg_label , foses in f_sdg_fos.items() :
     print(sdg_label, " - ", len(foses))
 
+with open('SDGFos.json', 'r') as file_:
+    sdg_fos_old = json.load( file_ )
+
 with open("SDGFos.json" , "w") as file_:
     file_.write( json.dumps( f_sdg_fos ) )
+
+
+update_info = dict()
+for sdg_label in f_sdg_fos.keys():
+    sdg_update_info = dict()
+
+    fos_old = sdg_fos_old[sdg_label]
+    fos_new = f_sdg_fos[sdg_label]
+    
+    fos_add = list(set(fos_new).difference(fos_old))
+    fos_remove = list(set(fos_old).difference(fos_new))
+
+    update_info[sdg_label] = {
+        'count_old': len(fos_old),
+        'count_new': len(fos_new),
+        'added': fos_add,
+        'removed': fos_remove
+    }
+
+with open('sdg_fos_update.json', 'w') as file_:
+    file_.write( json.dumps( update_info ) )
