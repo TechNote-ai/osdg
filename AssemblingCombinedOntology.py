@@ -8,6 +8,7 @@ Created on Thu Apr 30 16:51:39 2020
 
 import json
 import os
+import pandas as pd
 
 #%%
 
@@ -33,6 +34,13 @@ sdg_ontology_combined = {
     "SDG_17" : {} , 
     }
 
+# Getting blacklist
+blacklist = set()
+for directory in directories:
+    file_names = [ i for i in os.listdir( "./Raw_Data/" + directory + "/" ) if "_Blacklist.csv" in i ]
+    for file_name in file_names:
+        blacklist.update( pd.read_csv(f'./Raw_Data/{directory}/{file_name}')['fos_id'].tolist() )
+
 
 for directory in directories :
     file_name = [ i for i in os.listdir( "./Raw_Data/" + directory + "/" ) if "_ProcessedKeyTerms.json" in i ][0]
@@ -40,6 +48,7 @@ for directory in directories :
         processed_key_terms = json.loads( file_.read() )
     
     for sdg_label , key_terms in processed_key_terms.items() :
+        key_terms = set(key_terms).difference( blacklist )
         for term in key_terms :
             if term not in sdg_ontology_combined[ sdg_label ].keys() :
                 sdg_ontology_combined[ sdg_label ][ term ] = []
