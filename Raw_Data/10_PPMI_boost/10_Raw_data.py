@@ -66,46 +66,28 @@ number_map = {"1" : "SDG_1" ,
             "17" : "SDG_17",
             }
 
-sdg_words_raw = {}
+sdg_words = {}
 
 for row in tqdm(dfl) :
     if str( row['SDG number'] ) != "nan" :
         number = str( int( row['SDG number'] ) )
         sdg = number_map[ number ]
-        if sdg not in sdg_words_raw.keys() :
-            sdg_words_raw[ sdg ] = []
-        sdg_words_raw[ sdg ].append( row["FOS name"] )
+        if sdg not in sdg_words.keys() :
+            sdg_words[ sdg ] = []
+        sdg_words[ sdg ].append( row["FOS name"] )
 
 
 counter = 0
 print("Key Words Identified before cleaning : " )
-for key , value in sdg_words_raw.items() :
+for key , value in sdg_words.items() :
     print( key , " : ", len(value))
     counter += len(value)
 
 print("Overall : ", counter)
 
 #%%
-for key , value in sdg_words_raw.items() :
-    sdg_words_raw[ key ] = pre_proc( value )
-
-#%%
-"""
-Deduplicating keywords
-"""
-word_freq_dict = {}
-for val in list(sdg_words_raw.values()) :
-    for v in val :
-        if v not in word_freq_dict :
-            word_freq_dict[ v ] = 1
-        else:
-            word_freq_dict[ v ] += 1
-
-#%%
-sdg_words = {}
-for key , value in sdg_words_raw.items() :
-    plh = [ i  for i in value if word_freq_dict[i] < 2]
-    sdg_words[ key ] = plh
+for key , value in sdg_words.items() :
+    sdg_words[ key ] = pre_proc( set(value) )
 
 #%%
 js = json.dumps( sdg_words )
