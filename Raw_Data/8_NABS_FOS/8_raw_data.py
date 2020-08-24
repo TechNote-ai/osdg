@@ -4,7 +4,7 @@ import json
 import pandas as pd
 
 
-FNAME_PROCESSED_KEY_TERMS = "12_ProcessedKeyTerms.json"
+FNAME_PROCESSED_KEY_TERMS = "8_ProcessedKeyTerms.json"
 
 
 replacables_symbols = ["&" , "-"  , '"' ,  "  "]
@@ -36,17 +36,12 @@ def pre_proc(list_o_strings):
 if __name__ == '__main__':
     fos_data = pd.read_excel('NABS_FOS_update_2020-08-20_ed_VS.xlsx')[['FOS NAME', 'FOS NUMBER', 'SDG']].drop_duplicates()
 
-    # Blacklist
-    blacklist = set()
-    for fos_name, fos_id, sdg_nr in fos_data.values:
-        if sdg_nr == 'NOT RELEVANT':
-            blacklist.add((fos_id, fos_name))
-
-    pd.DataFrame(blacklist, columns=['fos_id', 'fos_name']).to_csv('12_Blacklist.csv', index=False)
+    # Ignore fos list
+    ignore_fos = fos_data[fos_data['SDG'] == 'NOT RELEVANT']['FOS NUMBER'].unique()
 
     # 
     sdg_fos = dict()
-    for fos_name, fos_id, sdg_nr in tqdm(fos_data[~fos_data['FOS NUMBER'].isin(list(map(lambda v: v[0], blacklist)))].values):
+    for fos_name, fos_id, sdg_nr in tqdm(fos_data[~fos_data['FOS NUMBER'].isin(ignore_fos)].values):
         sdg_label = f'SDG_{sdg_nr}'
         if sdg_label not in sdg_fos.keys():
             sdg_fos[sdg_label] = []
