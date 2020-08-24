@@ -34,13 +34,6 @@ sdg_ontology_combined = {
     "SDG_17" : {} , 
     }
 
-# Getting blacklist
-blacklist = set()
-for directory in directories:
-    file_names = [ i for i in os.listdir( "./Raw_Data/" + directory + "/" ) if "_Blacklist.csv" in i ]
-    for file_name in file_names:
-        blacklist.update( pd.read_csv(f'./Raw_Data/{directory}/{file_name}')['fos_id'].tolist() )
-
 
 for directory in directories :
     file_name = [ i for i in os.listdir( "./Raw_Data/" + directory + "/" ) if "_ProcessedKeyTerms.json" in i ][0]
