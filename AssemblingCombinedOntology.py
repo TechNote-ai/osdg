@@ -1,51 +1,125 @@
-#!/usr/bin/env python3
-# -*- coding: utf-8 -*-
-"""
-Created on Thu Apr 30 16:51:39 2020
-
-@author: lukas
-"""
+from collections import OrderedDict
 
 import json
 import os
 import pandas as pd
-
-#%%
-
-directories = [i for i in os.listdir("./Raw_Data/") if "." not in i]
-
-sdg_ontology_combined = {
-    "SDG_1" : {} , 
-    "SDG_2" : {} , 
-    "SDG_3" : {} , 
-    "SDG_4" : {} , 
-    "SDG_5" : {} , 
-    "SDG_6" : {} , 
-    "SDG_7" : {} , 
-    "SDG_8" : {} , 
-    "SDG_9" : {} , 
-    "SDG_10" : {} , 
-    "SDG_11" : {} , 
-    "SDG_12" : {} , 
-    "SDG_13" : {} , 
-    "SDG_14" : {} , 
-    "SDG_15" : {} , 
-    "SDG_16" : {} , 
-    "SDG_17" : {} , 
-    }
+import re
 
 
-for directory in directories :
-    file_name = [ i for i in os.listdir( "./Raw_Data/" + directory + "/" ) if "_ProcessedKeyTerms.json" in i ][0]
-    with open( f'./Raw_Data/{directory}/{file_name}', 'r' ) as file_:
-        processed_key_terms = json.loads( file_.read() )
+INTER_ADD_PATH = 'raw_data/0_add'
+
+add_generated_data_paths = [
+    f'{INTER_ADD_PATH}/01_add_generated/{directory_name}' 
+    for directory_name in os.listdir(f'{INTER_ADD_PATH}/01_add_generated') 
+    if '.' not in directory_name
+    ]
+
+add_validated_data_paths = [
+    f'{INTER_ADD_PATH}/00_add_validated/{directory_name}' 
+    for directory_name in os.listdir(f'{INTER_ADD_PATH}/00_add_validated') 
+    if '.' not in directory_name
+    ]
+
+
+# Gather *_ProcessedSDGFOS -----
+sdg_fos_add_validated, sdg_fos_add_generated = OrderedDict(), OrderedDict()
+fos_sources = {}
+
+# Validated
+for directory in add_validated_data_paths:
+    try:
+        processed_sdg_fos_fname = list(filter(lambda oname: '_ProcessedSDGFOS.json' in oname, os.listdir(directory)))[0]
+        with open(f'{directory}/{processed_sdg_fos_fname}', 'r') as file_:
+            processed_sdg_fos = json.load(file_)
+        processed_sdg_fos = {sdg_label: processed_sdg_fos[sdg_label] for sdg_label in sorted(processed_sdg_fos.keys())}
+    except IndexError:
+        print('Sdg Fos are not processed in {directory}')
+        continue
     
-    for sdg_label , key_terms in processed_key_terms.items() :
-        for term in key_terms :
-            if term not in sdg_ontology_combined[ sdg_label ].keys() :
-                sdg_ontology_combined[ sdg_label ][ term ] = []
-            sdg_ontology_combined[ sdg_label ][ term ].append( directory )
-                
-#%%
+    for sdg_label, foses in processed_sdg_fos.items():
+        if sdg_label not in sdg_fos_add_validated.keys():
+            sdg_fos_add_validated[sdg_label] = set()
+        sdg_fos_add_validated[sdg_label].update(foses)
+
+        # Update fos sources
+        if sdg_label not in fos_sources.keys():
+            fos_sources[sdg_label] = {}
+        for fos in sdg_fos_add_validated[sdg_label]:
+            if fos not in fos_sources[sdg_label].keys():
+                fos_sources[sdg_label][fos] = []
+            fos_sources[sdg_label][fos].append(directory)
+
+for sdg_label, foses in sdg_fos_add_validated.items():
+    sdg_fos_add_validated[sdg_label] = sorted(list(foses))
+
+with open(f'{INTER_ADD_PATH}/ValidatedSdgFos.json', 'w') as file_:
+    json.dump(sdg_fos_add_validated, file_)
+
+
+# Generated
+gen_fos_sources = {}
+
+for directory in add_generated_data_paths:
+    try:
+        processed_sdg_fos_fname = list(filter(lambda oname: '_ProcessedSDGFOS.json' in oname, os.listdir(directory)))[0]
+        with open(f'{directory}/{processed_sdg_fos_fname}', 'r') as file_:
+            processed_sdg_fos = json.load(file_)
+        processed_sdg_fos = {sdg_label: processed_sdg_fos[sdg_label] for sdg_label in sorted(processed_sdg_fos.keys())}
+    except IndexError:
+        print('SDG FOS are not processed in {directory}')
+        continue
+    
+    for sdg_label, foses in processed_sdg_fos.items():
+        if sdg_label not in sdg_fos_add_generated.keys():
+            sdg_fos_add_generated[sdg_label] = set()
+        sdg_fos_add_generated[sdg_label].update(foses)
+
+        # Update gen fos source
+        for fos in sdg_fos_add_generated[sdg_label]:
+            if fos not in fos_sources[sdg_label].keys():
+                fos_sources[sdg_label][fos] = []
+            fos_sources[sdg_label][fos].append(directory)
+
+fos_dist = OrderedDict()
+for foses in sdg_fos_add_generated.values():
+    for fos in foses:
+        if fos not in fos_dist.keys():
+            fos_dist[fos] = 1
+        else:
+            fos_dist[fos] += 1
+
+multi_sdg_fos = sorted([fos for fos, freq in fos_dist.items() if freq > 1])     # TODO add to file to keep track
+
+for sdg_label, foses in sdg_fos_add_generated.items():
+    for v_sdg_label, v_foses in sdg_fos_add_validated.items():
+        if v_sdg_label != sdg_label:
+            foses = foses.difference(v_foses)
+    sdg_fos_add_generated[sdg_label] = sorted(list(foses.difference(multi_sdg_fos)))
+
+    # Update fos source for both validated and generated
+    if sdg_label in gen_fos_sources.keys():
+        for fos_name, sources in gen_fos_sources[sdg_label].items():
+            if fos_name in sdg_fos_add_generated[sdg_label]:
+                if fos_name not in fos_sources[sdg_label].keys():
+                    fos_sources[sdg_label][fos_name] = []
+                fos_sources[sdg_label][fos_name] += sources
+
+with open(f'{INTER_ADD_PATH}/GeneratedSdgFos.json', 'w') as file_:
+    json.dump(sdg_fos_add_generated, file_)
+
+# Combined Validated and Generated Sdg Fos
+sdg_ontology_combined = OrderedDict()
+
+sdg_labels = sorted(set(list(sdg_fos_add_validated.keys()) + list(sdg_fos_add_generated.keys())), key=lambda x: int(re.findall(r'\d+', x)[0]))
+for sdg_label in sdg_labels:
+    sdg_ontology_combined[sdg_label] = OrderedDict()
+    validated_fos = sdg_fos_add_validated[sdg_label]
+    generated_fos = sdg_fos_add_generated[sdg_label]
+
+    for fos in sorted(list(set(validated_fos + generated_fos))):
+        if fos not in sdg_ontology_combined[sdg_label].keys():
+            sdg_ontology_combined[sdg_label][fos] = dict()
+        sdg_ontology_combined[sdg_label][fos] = fos_sources[sdg_label][fos]
+
 with open("CombinedOntology.json" , "w") as file_:
-    file_.write( json.dumps( sdg_ontology_combined ) )
+    file_.write(json.dumps(sdg_ontology_combined))
