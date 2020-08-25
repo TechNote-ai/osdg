@@ -41,7 +41,6 @@ for directory in directories :
         processed_key_terms = json.loads( file_.read() )
     
     for sdg_label , key_terms in processed_key_terms.items() :
-        key_terms = set(key_terms).difference( blacklist )
         for term in key_terms :
             if term not in sdg_ontology_combined[ sdg_label ].keys() :
                 sdg_ontology_combined[ sdg_label ][ term ] = []
