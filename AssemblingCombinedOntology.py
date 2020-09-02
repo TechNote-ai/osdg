@@ -2,29 +2,28 @@ from collections import OrderedDict
 
 import json
 import os
-import pandas as pd
 import re
 
 
 INTER_ADD_PATH = 'raw_data/0_add'
 
 add_validated_data_paths = [
-    f'{INTER_ADD_PATH}/00_add_validated/{directory_name}' 
-    for directory_name in os.listdir(f'{INTER_ADD_PATH}/00_add_validated') 
+    f'{INTER_ADD_PATH}/00_add_validated/{directory_name}'
+    for directory_name in os.listdir(f'{INTER_ADD_PATH}/00_add_validated')
     if '.' not in directory_name
     ]
 
 add_generated_data_paths = [
-    f'{INTER_ADD_PATH}/01_add_generated/{directory_name}' 
-    for directory_name in os.listdir(f'{INTER_ADD_PATH}/01_add_generated') 
+    f'{INTER_ADD_PATH}/01_add_generated/{directory_name}'
+    for directory_name in os.listdir(f'{INTER_ADD_PATH}/01_add_generated')
     if '.' not in directory_name
     ]
 
 add_all_to_all_data_paths = [
-    f'{INTER_ADD_PATH}/02_add_all_to_all/{directory_name}' 
+    f'{INTER_ADD_PATH}/02_add_all_to_all/{directory_name}'
     for directory_name in os.listdir(f'{INTER_ADD_PATH}/02_add_all_to_all')
     if '.' not in directory_name
-    ]  
+    ]
 
 
 # Gather *_ProcessedSDGFOS -----
@@ -41,7 +40,7 @@ for directory in add_validated_data_paths:
     except IndexError:
         print('Sdg Fos are not processed in {directory}')
         continue
-    
+
     for sdg_label, foses in processed_sdg_fos.items():
         if sdg_label not in sdg_fos_add_validated.keys():
             sdg_fos_add_validated[sdg_label] = set()
@@ -65,7 +64,7 @@ for directory in add_all_to_all_data_paths:
     except IndexError:
         print('Sdg Fos are not processed in {directory}')
         continue
-    
+
     for sdg_label, foses in processed_sdg_fos.items():
         if sdg_label not in sdg_fos_add_validated.keys():
             sdg_fos_add_validated[sdg_label] = set()
@@ -80,9 +79,8 @@ for directory in add_all_to_all_data_paths:
             fos_sources[sdg_label][fos].append(directory.split('/')[-1])
 
 sdg_fos_add_validated = {
-    sdg_label: sorted(list(sdg_fos_add_validated[sdg_label])) 
-    for sdg_label in sorted(sdg_fos_add_validated, 
-    key=lambda l: int(re.search(r'\d+', l).group(0)))
+    sdg_label: sorted(list(sdg_fos_add_validated[sdg_label]))
+    for sdg_label in sorted(sdg_fos_add_validated, key=lambda l: int(re.search(r'\d+', l).group(0)))
     }
 
 with open(f'{INTER_ADD_PATH}/ValidatedSdgFos.json', 'w') as file_:
@@ -101,7 +99,7 @@ for directory in add_generated_data_paths:
     except IndexError:
         print('SDG FOS are not processed in {directory}')
         continue
-    
+
     for sdg_label, foses in processed_sdg_fos.items():
         if sdg_label not in sdg_fos_add_generated.keys():
             sdg_fos_add_generated[sdg_label] = set()
@@ -111,7 +109,7 @@ for directory in add_generated_data_paths:
         for fos in sdg_fos_add_generated[sdg_label]:
             if fos not in fos_sources[sdg_label].keys():
                 fos_sources[sdg_label][fos] = []
-            fos_sources[sdg_label][fos].append(directory)
+            fos_sources[sdg_label][fos].append(directory.split('/')[-1])
 
 fos_dist = OrderedDict()
 for foses in sdg_fos_add_generated.values():
@@ -139,9 +137,8 @@ for sdg_label, foses in sdg_fos_add_generated.items():
                 fos_sources[sdg_label][fos_name] += sources
 
 sdg_fos_add_generated = {
-    sdg_label: sorted(list(sdg_fos_add_generated[sdg_label])) 
-    for sdg_label in sorted(sdg_fos_add_generated, 
-    key=lambda l: int(re.search(r'\d+', l).group(0)))
+    sdg_label: sorted(list(sdg_fos_add_generated[sdg_label]))
+    for sdg_label in sorted(sdg_fos_add_generated, key=lambda l: int(re.search(r'\d+', l).group(0)))
     }
 
 with open(f'{INTER_ADD_PATH}/GeneratedSdgFos.json', 'w') as file_:
@@ -161,5 +158,5 @@ for sdg_label in sdg_labels:
             sdg_ontology_combined[sdg_label][fos] = dict()
         sdg_ontology_combined[sdg_label][fos] = fos_sources[sdg_label][fos]
 
-with open("CombinedOntology.json" , "w") as file_:
+with open("CombinedOntology.json", "w") as file_:
     file_.write(json.dumps(sdg_ontology_combined))
