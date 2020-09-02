@@ -156,7 +156,7 @@ for sdg_label in sdg_labels:
     for fos in sorted(list(set(validated_fos + generated_fos))):
         if fos not in sdg_ontology_combined[sdg_label].keys():
             sdg_ontology_combined[sdg_label][fos] = dict()
-        sdg_ontology_combined[sdg_label][fos] = fos_sources[sdg_label][fos]
+        sdg_ontology_combined[sdg_label][fos] = sorted(fos_sources[sdg_label][fos])
 
 with open("CombinedOntology.json", "w") as file_:
     file_.write(json.dumps(sdg_ontology_combined))
