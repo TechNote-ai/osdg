@@ -28,8 +28,8 @@ add_all_to_all_data_paths = [
 
 
 # Gather *_ProcessedSDGFOS -----
-sdg_fos_add_validated, sdg_fos_add_generated = OrderedDict(), OrderedDict()
-fos_sources = OrderedDict()
+sdg_fos_add_validated, sdg_fos_add_generated = dict(), dict()
+fos_sources = dict()
 
 # Validated
 for directory in add_validated_data_paths:
@@ -124,10 +124,11 @@ for foses in sdg_fos_add_generated.values():
 multi_sdg_fos = sorted([fos for fos, freq in fos_dist.items() if freq > 1])     # TODO add to file to keep track
 
 for sdg_label, foses in sdg_fos_add_generated.items():
+    foses = foses.difference(multi_sdg_fos)
     for v_sdg_label, v_foses in sdg_fos_add_validated.items():
         if v_sdg_label != sdg_label:
             foses = foses.difference(v_foses)
-    sdg_fos_add_generated[sdg_label] = sorted(list(foses.difference(multi_sdg_fos)))
+    sdg_fos_add_generated[sdg_label] = foses
 
     # Update fos source for both validated and generated
     if sdg_label in gen_fos_sources.keys():
@@ -136,6 +137,12 @@ for sdg_label, foses in sdg_fos_add_generated.items():
                 if fos_name not in fos_sources[sdg_label].keys():
                     fos_sources[sdg_label][fos_name] = []
                 fos_sources[sdg_label][fos_name] += sources
+
+sdg_fos_add_generated = {
+    sdg_label: sorted(list(sdg_fos_add_generated[sdg_label])) 
+    for sdg_label in sorted(sdg_fos_add_generated, 
+    key=lambda l: int(re.search(r'\d+', l).group(0)))
+    }
 
 with open(f'{INTER_ADD_PATH}/GeneratedSdgFos.json', 'w') as file_:
     json.dump(sdg_fos_add_generated, file_)
@@ -152,7 +159,7 @@ for sdg_label in sdg_labels:
     for fos in sorted(list(set(validated_fos + generated_fos))):
         if fos not in sdg_ontology_combined[sdg_label].keys():
             sdg_ontology_combined[sdg_label][fos] = dict()
-        sdg_ontology_combined[sdg_label][fos] = fos_sources[sdg_label][fos]
+        sdg_ontology_combined[sdg_label][fos] = fos_sources[sdg_label][fos].split('/')[-1]
 
 with open("CombinedOntology.json" , "w") as file_:
     file_.write(json.dumps(sdg_ontology_combined))
