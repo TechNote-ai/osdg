@@ -80,7 +80,7 @@ for directory in add_all_to_all_data_paths:
 
 sdg_fos_add_validated = {
     sdg_label: sorted(list(sdg_fos_add_validated[sdg_label]))
-    for sdg_label in sorted(sdg_fos_add_validated, key=lambda l: int(re.search(r'\d+', l).group(0)))
+    for sdg_label in sorted(sdg_fos_add_validated, key=lambda x: int(re.findall(r'\d+', x)[0]))
     }
 
 with open(f'{INTER_ADD_PATH}/ValidatedSdgFos.json', 'w') as file_:
@@ -138,7 +138,7 @@ for sdg_label, foses in sdg_fos_add_generated.items():
 
 sdg_fos_add_generated = {
     sdg_label: sorted(list(sdg_fos_add_generated[sdg_label]))
-    for sdg_label in sorted(sdg_fos_add_generated, key=lambda l: int(re.search(r'\d+', l).group(0)))
+    for sdg_label in sorted(sdg_fos_add_generated, key=lambda x: int(re.findall(r'\d+', x)[0]))
     }
 
 with open(f'{INTER_ADD_PATH}/GeneratedSdgFos.json', 'w') as file_:
@@ -156,7 +156,7 @@ for sdg_label in sdg_labels:
     for fos in sorted(list(set(validated_fos + generated_fos))):
         if fos not in sdg_ontology_combined[sdg_label].keys():
             sdg_ontology_combined[sdg_label][fos] = dict()
-        sdg_ontology_combined[sdg_label][fos] = sorted(fos_sources[sdg_label][fos])
+        sdg_ontology_combined[sdg_label][fos] = sorted(fos_sources[sdg_label][fos], key=lambda x: int(re.findall(r'\d+', x)[0]))
 
 with open("CombinedOntology.json", "w") as file_:
     file_.write(json.dumps(sdg_ontology_combined))
