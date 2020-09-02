@@ -8,22 +8,28 @@ import re
 
 INTER_ADD_PATH = 'raw_data/0_add'
 
-add_generated_data_paths = [
-    f'{INTER_ADD_PATH}/01_add_generated/{directory_name}' 
-    for directory_name in os.listdir(f'{INTER_ADD_PATH}/01_add_generated') 
-    if '.' not in directory_name
-    ]
-
 add_validated_data_paths = [
     f'{INTER_ADD_PATH}/00_add_validated/{directory_name}' 
     for directory_name in os.listdir(f'{INTER_ADD_PATH}/00_add_validated') 
     if '.' not in directory_name
     ]
 
+add_generated_data_paths = [
+    f'{INTER_ADD_PATH}/01_add_generated/{directory_name}' 
+    for directory_name in os.listdir(f'{INTER_ADD_PATH}/01_add_generated') 
+    if '.' not in directory_name
+    ]
+
+add_all_to_all_data_paths = [
+    f'{INTER_ADD_PATH}/02_add_all_to_all/{directory_name}' 
+    for directory_name in os.listdir(f'{INTER_ADD_PATH}/02_add_all_to_all')
+    if '.' not in directory_name
+    ]  
+
 
 # Gather *_ProcessedSDGFOS -----
 sdg_fos_add_validated, sdg_fos_add_generated = OrderedDict(), OrderedDict()
-fos_sources = {}
+fos_sources = OrderedDict()
 
 # Validated
 for directory in add_validated_data_paths:
@@ -43,21 +49,48 @@ for directory in add_validated_data_paths:
 
         # Update fos sources
         if sdg_label not in fos_sources.keys():
-            fos_sources[sdg_label] = {}
+            fos_sources[sdg_label] = OrderedDict()
         for fos in sdg_fos_add_validated[sdg_label]:
             if fos not in fos_sources[sdg_label].keys():
                 fos_sources[sdg_label][fos] = []
             fos_sources[sdg_label][fos].append(directory)
 
-for sdg_label, foses in sdg_fos_add_validated.items():
-    sdg_fos_add_validated[sdg_label] = sorted(list(foses))
+# All to all    # TODO leave it for matching? if not, it goes into assembling sdg_fos_script. Must be checked for conflicts when assembling generated
+for directory in add_all_to_all_data_paths:
+    try:
+        processed_sdg_fos_fname = list(filter(lambda oname: '_ProcessedSDGFOS.json' in oname, os.listdir(directory)))[0]
+        with open(f'{directory}/{processed_sdg_fos_fname}', 'r') as file_:
+            processed_sdg_fos = json.load(file_)
+        processed_sdg_fos = {sdg_label: processed_sdg_fos[sdg_label] for sdg_label in sorted(processed_sdg_fos.keys())}
+    except IndexError:
+        print('Sdg Fos are not processed in {directory}')
+        continue
+    
+    for sdg_label, foses in processed_sdg_fos.items():
+        if sdg_label not in sdg_fos_add_validated.keys():
+            sdg_fos_add_validated[sdg_label] = set()
+        sdg_fos_add_validated[sdg_label].update(foses)
+
+        # Update fos sources
+        if sdg_label not in fos_sources.keys():
+            fos_sources[sdg_label] = OrderedDict()
+        for fos in sdg_fos_add_validated[sdg_label]:
+            if fos not in fos_sources[sdg_label].keys():
+                fos_sources[sdg_label][fos] = []
+            fos_sources[sdg_label][fos].append(directory)
+
+sdg_fos_add_validated = {
+    sdg_label: sorted(list(sdg_fos_add_validated[sdg_label])) 
+    for sdg_label in sorted(sdg_fos_add_validated, 
+    key=lambda l: int(re.search(r'\d+', l).group(0)))
+    }
 
 with open(f'{INTER_ADD_PATH}/ValidatedSdgFos.json', 'w') as file_:
     json.dump(sdg_fos_add_validated, file_)
 
 
 # Generated
-gen_fos_sources = {}
+gen_fos_sources = dict()
 
 for directory in add_generated_data_paths:
     try:
