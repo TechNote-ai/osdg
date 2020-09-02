@@ -42,7 +42,7 @@ sdg_words = {}
 
 for row in dfl:
     if str(row['SDG number']) != "nan":
-        sdg = f"SDG_{row['SDG number']}"
+        sdg = f"SDG_{int(row['SDG number'])}"
         if sdg not in sdg_words.keys():
             sdg_words[sdg] = []
         sdg_words[sdg].append((row['FOS number'], row["FOS name"]))
