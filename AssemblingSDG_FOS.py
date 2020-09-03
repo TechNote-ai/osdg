@@ -1,13 +1,14 @@
 from multiprocessing import cpu_count
 from tqdm import tqdm
 from utils import process_fosname, levenshtein_ratio, sws
+
 import concurrent.futures
 import json
 
 
 with open("FOSMAP.json", "r") as file_:
     fos_map = json.loads(file_.read())
-fosmap_r = {process_fosname(name): id_ for id_, name in fos_map.items()}
+matching_fos = [(fos_id, process_fosname(fos_name)) for fos_id, fos_name in fos_map.items()]
 
 with open("CombinedOntology.json", "r") as file_:
     sdg_keywords = json.loads(file_.read())
@@ -21,22 +22,22 @@ with open("CombinedOntology.json", "r") as file_:
 """
 
 
-def _match_keywords_to_fos(sdg_label, keywords, b_sws, tqdm_pos):
+def _match_keywords_to_fos(sdg_label, keywords, fos_to_match, b_sws, tqdm_pos):
     sdg_matched_ids, sdg_matched_names = dict(), dict()
 
     for keyword, sources in tqdm(keywords.items(), desc=f'Processing {sdg_label}', position=tqdm_pos, leave=False):
         matches_fos_ids, matched_fos_names = [], []
 
         keyword_parts = list(filter(lambda w: w not in b_sws, keyword.split()))
-        for fos_name, fos_id in fosmap_r.items():
+        for fos_id, fos_name in fos_to_match:
             if all(p in fos_name for p in keyword_parts) and levenshtein_ratio(keyword, fos_name) > 0.85:
                 matches_fos_ids.append(fos_id)
                 matched_fos_names.append(fos_name)
 
         sdg_matched_ids[keyword] = {
-                "sources": sources,
-                "matchedFOS": matches_fos_ids
-                }
+            "sources": sources,
+            "matchedFOS": matches_fos_ids
+            }
         sdg_matched_names[keyword] = {
             "sources": sources,
             "matchedFOS": matched_fos_names
@@ -53,9 +54,9 @@ with concurrent.futures.ProcessPoolExecutor(max_workers=n_workers) as executor:
         futures = []
         futures.append(executor.submit(
             _match_keywords_to_fos,
-            sdg_label, keywords, sws, idx
+            sdg_label, keywords, matching_fos, sws, idx
         ))
-    for future in concurrent.futures.as_completed(futures):#tqdm(concurrent.futures.as_completed(futures), total=len(sdg_keywords), desc='MATCHING SDG KEYWORDS'):
+    for future in concurrent.futures.as_completed(futures): #tqdm(concurrent.futures.as_completed(futures), total=len(sdg_keywords), desc='MATCHING SDG KEYWORDS'):
         sdg_label, *matched_foses = future.result()
         sdg_fos_ids[sdg_label], sdg_fos_names[sdg_label] = matched_foses
 
