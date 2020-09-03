@@ -1,11 +1,9 @@
-from functools import partial
 from multiprocessing import cpu_count
 from tqdm import tqdm
 from utils import process_fosname, levenshtein_ratio, sws
 
-# import concurrent.futures
+import concurrent.futures
 import json
-import multiprocessing
 
 
 with open("FOSMAP.json", "r") as file_:
