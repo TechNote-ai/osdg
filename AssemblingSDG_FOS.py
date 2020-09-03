@@ -1,9 +1,11 @@
+from functools import partial
 from multiprocessing import cpu_count
 from tqdm import tqdm
 from utils import process_fosname, levenshtein_ratio, sws
 
-import concurrent.futures
+# import concurrent.futures
 import json
+import multiprocessing
 
 
 with open("FOSMAP.json", "r") as file_:
@@ -56,7 +58,7 @@ with concurrent.futures.ProcessPoolExecutor(max_workers=n_workers) as executor:
             _match_keywords_to_fos,
             sdg_label, keywords, matching_fos, sws, idx
         ))
-    for future in concurrent.futures.as_completed(futures): #tqdm(concurrent.futures.as_completed(futures), total=len(sdg_keywords), desc='MATCHING SDG KEYWORDS'):
+    for future in concurrent.futures.as_completed(futures):
         sdg_label, *matched_foses = future.result()
         sdg_fos_ids[sdg_label], sdg_fos_names[sdg_label] = matched_foses
 
