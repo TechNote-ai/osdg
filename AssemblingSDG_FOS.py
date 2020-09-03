@@ -24,7 +24,7 @@ with open("CombinedOntology.json", "r") as file_:
 def _match_keywords_to_fos(sdg_label, keywords, b_sws, tqdm_pos):
     sdg_matched_ids, sdg_matched_names = dict(), dict()
 
-    for keyword, sources in tqdm(keywords.items(), desc=f'Processing {sdg_label}', position=tqdm_pos):
+    for keyword, sources in tqdm(keywords.items(), desc=f'Processing {sdg_label}', position=tqdm_pos, leave=False):
         matches_fos_ids, matched_fos_names = [], []
 
         keyword_parts = list(filter(lambda w: w not in b_sws, keyword.split()))
@@ -53,9 +53,9 @@ with concurrent.futures.ProcessPoolExecutor(max_workers=n_workers) as executor:
         futures = []
         futures.append(executor.submit(
             _match_keywords_to_fos,
-            sdg_label, keywords, sws, idx+2
+            sdg_label, keywords, sws, idx
         ))
-    for future in tqdm(concurrent.futures.as_completed(futures), total=len(sdg_keywords), desc='MATCHING SDG KEYWORDS', position=0):
+    for future in concurrent.futures.as_completed(futures):#tqdm(concurrent.futures.as_completed(futures), total=len(sdg_keywords), desc='MATCHING SDG KEYWORDS'):
         sdg_label, *matched_foses = future.result()
         sdg_fos_ids[sdg_label], sdg_fos_names[sdg_label] = matched_foses
 
