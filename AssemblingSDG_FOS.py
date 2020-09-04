@@ -22,9 +22,11 @@ fos_to_match = [(fos_id, process_fosname(fos_name)) for fos_id, fos_name in fos_
 """
 
 
-def _match_keywords_to_fos(sdg_label, keywords, fos_to_match, sws, total, use_pbar, step):
+def _match_keywords_to_fos(sdg_label, keywords, fos_to_match, sws, use_pbar, total):
     sdg_matched_ids, sdg_matched_names = dict(), dict()
     if use_pbar:
+        step = total // len(keywords)
+        total = step * len(keywords)
         p_bar = tqdm(keywords, desc=f'Processing {sdg_label}', total=total, leave=True)
     for keyword, sources in keywords:
         matches_fos_ids, matched_fos_names = [], []
@@ -48,7 +50,7 @@ def _match_keywords_to_fos(sdg_label, keywords, fos_to_match, sws, total, use_pb
     return sdg_label, sdg_matched_ids, sdg_matched_names
 
 
-n_workers = cpu_count() - 1
+n_workers = cpu_count() - 3
 
 sdg_fos_ids, sdg_fos_names = dict(), dict()
 for sdg_label, keywords in sdg_keywords.items():
@@ -62,7 +64,7 @@ for sdg_label, keywords in sdg_keywords.items():
             futures.append(executor.submit(
                 _match_keywords_to_fos,
                 sdg_label, keyword_batch, fos_to_match[:], sws, 
-                total=len(keywords), use_pbar=use_pbar, step=n_workers
+                use_pbar=use_pbar, total=len(keywords)
             ))
 
         for future in concurrent.futures.as_completed(futures):
@@ -108,11 +110,17 @@ with open("SDGFos.json", "w") as file_:
 
 # Compare SDGFos.json to the last version
 update_info = dict()
-for sdg_label in f_sdg_fos.keys():
+for sdg_label in sorted(set(list(f_sdg_fos.keys()) + list(fos_old.keys())), key=lambda x: re.findall(r'\d+', x)[0]):
     sdg_update_info = dict()
-
-    fos_old = sdg_fos_old[sdg_label]
-    fos_new = f_sdg_fos[sdg_label]
+    
+    try:
+        fos_old = sdg_fos_old[sdg_label]
+    except KeyError:
+        fos_old = []
+    try:
+        fos_new = f_sdg_fos[sdg_label]
+    except KeyError:
+        fos_new = []
 
     fos_add = list(set(fos_new).difference(fos_old))
     fos_remove = list(set(fos_old).difference(fos_new))
