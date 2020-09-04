@@ -110,7 +110,7 @@ with open("SDGFos.json", "w") as file_:
 
 # Compare SDGFos.json to the last version
 update_info = dict()
-for sdg_label in sorted(set(list(f_sdg_fos.keys()) + list(fos_old.keys())), key=lambda x: re.findall(r'\d+', x)[0]):
+for sdg_label in sorted(set(list(f_sdg_fos.keys()) + list(sdg_fos_old.keys())), key=lambda x: re.findall(r'\d+', x)[0]):
     sdg_update_info = dict()
     
     try:
