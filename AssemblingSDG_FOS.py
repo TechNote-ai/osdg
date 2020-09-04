@@ -1,10 +1,10 @@
 from multiprocessing import cpu_count
 from tqdm import tqdm
-from utils import process_fosname, levenshtein_ratio, sws, imap_unordered_bar
+from utils import process_fosname, levenshtein_ratio, sws
 
 import concurrent.futures
-import multiprocessing
 import json
+import re
 
 with open("CombinedOntology.json", "r") as file_:
     sdg_keywords = json.loads(file_.read())
