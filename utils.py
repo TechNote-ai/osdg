@@ -1,3 +1,5 @@
+from multiprocessing import Pool
+from tqdm import tqdm
 import numpy as np
 
 sws = set([
@@ -102,3 +104,16 @@ def process_fosname(string):
     if string[0] == " ":
         string = string[1:]
     return string
+
+
+def imap_unordered_bar(func, iterable, n_workers=2, **kwargs):
+    p = Pool(n_workers)
+    res_list = []
+    with tqdm(total=len(iterable)) as pbar:
+        for i, res in tqdm(enumerate(p.imap_unordered(func, iterable)), **kwargs):
+            pbar.update()
+            res_list.append(res)
+    pbar.close()
+    p.close()
+    p.join()
+    return res_list

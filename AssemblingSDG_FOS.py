@@ -1,17 +1,17 @@
 from multiprocessing import cpu_count
 from tqdm import tqdm
-from utils import process_fosname, levenshtein_ratio, sws
+from utils import process_fosname, levenshtein_ratio, sws, imap_unordered_bar
 
 import concurrent.futures
+import multiprocessing
 import json
-
-
-with open("FOSMAP.json", "r") as file_:
-    fos_map = json.loads(file_.read())
-matching_fos = [(fos_id, process_fosname(fos_name)) for fos_id, fos_name in fos_map.items()]
 
 with open("CombinedOntology.json", "r") as file_:
     sdg_keywords = json.loads(file_.read())
+
+with open("FOSMAP.json", "r") as file_:
+    fos_map = json.loads(file_.read())
+fos_to_match = [(fos_id, process_fosname(fos_name)) for fos_id, fos_name in fos_map.items()]
 
 
 """
@@ -22,13 +22,13 @@ with open("CombinedOntology.json", "r") as file_:
 """
 
 
-def _match_keywords_to_fos(sdg_label, keywords, fos_to_match, b_sws, tqdm_pos):
+def _match_keywords_to_fos(sdg_label, keywords, fos_to_match, sws, total, use_pbar, step):
     sdg_matched_ids, sdg_matched_names = dict(), dict()
-
-    for keyword, sources in tqdm(keywords.items(), desc=f'Processing {sdg_label}', position=tqdm_pos, leave=False):
+    if use_pbar:
+        p_bar = tqdm(keywords, desc=f'Processing {sdg_label}', total=total, leave=True)
+    for keyword, sources in keywords:
         matches_fos_ids, matched_fos_names = [], []
-
-        keyword_parts = list(filter(lambda w: w not in b_sws, keyword.split()))
+        keyword_parts = list(filter(lambda w: w not in sws, keyword.split()))
         for fos_id, fos_name in fos_to_match:
             if all(p in fos_name for p in keyword_parts) and levenshtein_ratio(keyword, fos_name) > 0.85:
                 matches_fos_ids.append(fos_id)
@@ -42,23 +42,37 @@ def _match_keywords_to_fos(sdg_label, keywords, fos_to_match, b_sws, tqdm_pos):
             "sources": sources,
             "matchedFOS": matched_fos_names
             }
+        if use_pbar:
+            p_bar.update(step)
 
     return sdg_label, sdg_matched_ids, sdg_matched_names
 
 
-sdg_fos_ids, sdg_fos_names = dict(), dict()
+n_workers = cpu_count() - 1
 
-n_workers = len(sdg_keywords) if len(sdg_keywords) < cpu_count() - 1 else cpu_count() - 1
-with concurrent.futures.ProcessPoolExecutor(max_workers=n_workers) as executor:
-    for idx, (sdg_label, keywords) in enumerate(sdg_keywords.items()):
+sdg_fos_ids, sdg_fos_names = dict(), dict()
+for sdg_label, keywords in sdg_keywords.items():
+    keywords = list(keywords.items())
+    bs = (len(keywords) + n_workers - 1) // n_workers
+    with concurrent.futures.ProcessPoolExecutor(max_workers=n_workers) as executor:
         futures = []
-        futures.append(executor.submit(
-            _match_keywords_to_fos,
-            sdg_label, keywords, matching_fos, sws, idx
-        ))
-    for future in concurrent.futures.as_completed(futures):
-        sdg_label, *matched_foses = future.result()
-        sdg_fos_ids[sdg_label], sdg_fos_names[sdg_label] = matched_foses
+        for i in range(n_workers):
+            keyword_batch = keywords[i*bs:(i+1)*bs]
+            use_pbar = (i==n_workers-2)
+            futures.append(executor.submit(
+                _match_keywords_to_fos,
+                sdg_label, keyword_batch, fos_to_match[:], sws, 
+                total=len(keywords), use_pbar=use_pbar, step=n_workers
+            ))
+
+        for future in concurrent.futures.as_completed(futures):
+            sdg_label, matched_fos_ids, matched_fos_names = future.result()
+            if sdg_label not in sdg_fos_ids.keys():
+                sdg_fos_ids[sdg_label] = dict()
+            if sdg_label not in sdg_fos_names.keys():
+                sdg_fos_names[sdg_label] = dict()
+            sdg_fos_ids[sdg_label].update(matched_fos_ids)
+            sdg_fos_names[sdg_label].update(matched_fos_names)
 
 
 with open("SDGFosIDs.json", "w") as file_:
@@ -92,7 +106,7 @@ with open('SDGFos_ver-min-1.json', 'w') as file_:
 with open("SDGFos.json", "w") as file_:
     json.dump(f_sdg_fos, file_)
 
-# --------------------------------------- Compare SDGFos.json to last version
+# Compare SDGFos.json to the last version
 update_info = dict()
 for sdg_label in f_sdg_fos.keys():
     sdg_update_info = dict()
@@ -111,4 +125,4 @@ for sdg_label in f_sdg_fos.keys():
     }
 
 with open('sdg_fos_update.json', 'w') as file_:
-    file_.write(update_info, file_)
+    json.dump(update_info, file_)
