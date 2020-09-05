@@ -37,12 +37,12 @@ def _match_keywords_to_fos(sdg_label, keywords, fos_to_match, sws, use_pbar, tot
                 matched_fos_names.append(fos_name)
 
         sdg_matched_ids[keyword] = {
-            "sources": sources,
-            "matchedFOS": matches_fos_ids
+            "sources": sorted(sources),
+            "matchedFOS": sorted(matches_fos_ids)
             }
         sdg_matched_names[keyword] = {
-            "sources": sources,
-            "matchedFOS": matched_fos_names
+            "sources": sorted(sources),
+            "matchedFOS": sorted(matched_fos_names)
             }
         if use_pbar:
             p_bar.update(step)
@@ -80,6 +80,17 @@ for sdg_label, keywords in sdg_keywords.items():
             sdg_fos_ids[sdg_label].update(matched_fos_ids)
             sdg_fos_names[sdg_label].update(matched_fos_names)
 
+sdg_labels = sorted(sdg_fos_ids.keys(), key=lambda x: re.findall(r'\d+', x)[0])
+sdg_fos_ids = {
+    sdg_label: {
+        fos: sdg_fos_ids[sdg_label][fos] for fos in sorted(sdg_fos_ids[sdg_label].keys())
+    } for sdg_label in sdg_labels
+}
+sdg_fos_names = {
+    sdg_label: {
+        fos: sdg_fos_names[sdg_label][fos] for fos in sorted(sdg_fos_names[sdg_label].keys())
+    } for sdg_label in sdg_labels
+}
 
 with open("SDGFosIDs.json", "w") as file_:
     json.dump(sdg_fos_ids, file_)
