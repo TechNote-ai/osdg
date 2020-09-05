@@ -55,15 +55,19 @@ n_workers = cpu_count() - 1
 sdg_fos_ids, sdg_fos_names = dict(), dict()
 for sdg_label, keywords in sdg_keywords.items():
     keywords = list(keywords.items())
+    keyword_batches = []
     bs = (len(keywords) + n_workers - 1) // n_workers
+    for i in range(n_workers):
+        batch = keywords[i*bs:(i+1)*bs]
+        if keyword_batch:
+            keyword_batches.append(batch)
     with concurrent.futures.ProcessPoolExecutor(max_workers=n_workers) as executor:
         futures = []
-        for i in range(n_workers):
-            keyword_batch = keywords[i*bs:(i+1)*bs]
-            use_pbar = (i==n_workers-2)
+        for i, batch in enumerate(keyword_batches):
+            use_pbar = (i==len(keyword_batches)-2)
             futures.append(executor.submit(
                 _match_keywords_to_fos,
-                sdg_label, keyword_batch, fos_to_match[:], sws, 
+                sdg_label, batch, fos_to_match[:], sws, 
                 use_pbar=use_pbar, total=len(keywords)
             ))
 
