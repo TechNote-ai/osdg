@@ -59,7 +59,7 @@ for sdg_label, keywords in sdg_keywords.items():
     bs = (len(keywords) + n_workers - 1) // n_workers
     for i in range(n_workers):
         batch = keywords[i*bs:(i+1)*bs]
-        if keyword_batch:
+        if batch:
             keyword_batches.append(batch)
     with concurrent.futures.ProcessPoolExecutor(max_workers=n_workers) as executor:
         futures = []
