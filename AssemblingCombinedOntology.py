@@ -65,7 +65,7 @@ for directory in add_all_to_all_data_paths:
         print('Sdg Fos are not processed in {directory}')
         continue
 
-    for sdg_label, foses in processed_sdg_terms.items():
+    for sdg_label, foses in processed_sdg_fos.items():
         terms = list(map(lambda x: x[1], foses))    # TODO All to all has ids and might move to Assemblign SdgFos script
         if sdg_label not in sdg_terms_add_validated.keys():
             sdg_terms_add_validated[sdg_label] = set()
