@@ -1,8 +1,8 @@
 from collections import OrderedDict
+from utils import sdg_label_sort
 
 import json
 import os
-import re
 
 
 INTER_ADD_PATH = 'raw_data/0_add'
@@ -82,7 +82,7 @@ for directory in add_all_to_all_data_paths:
 
 sdg_terms_add_validated = {
     sdg_label: sorted(list(sdg_terms_add_validated[sdg_label]))
-    for sdg_label in sorted(sdg_terms_add_validated.keys(), key=lambda x: int(re.findall(r'\d+', x)[0]))
+    for sdg_label in sorted(sdg_terms_add_validated.keys(), key=sdg_label_sort)
     }
 
 with open(f'{INTER_ADD_PATH}/ValidatedSdgTerms.json', 'w') as file_:
@@ -140,7 +140,7 @@ for sdg_label, terms in sdg_terms_add_generated.items():
 
 sdg_terms_add_generated = {
     sdg_label: sorted(list(sdg_terms_add_generated[sdg_label]))
-    for sdg_label in sorted(sdg_terms_add_generated.keys(), key=lambda x: int(re.findall(r'\d+', x)[0]))
+    for sdg_label in sorted(sdg_terms_add_generated.keys(), key=sdg_label_sort) 
     }
 
 with open(f'{INTER_ADD_PATH}/GeneratedSdgTerms.json', 'w') as file_:
@@ -149,7 +149,7 @@ with open(f'{INTER_ADD_PATH}/GeneratedSdgTerms.json', 'w') as file_:
 # Combined Validated and Generated Sdg Terms
 sdg_ontology_combined = OrderedDict()
 
-sdg_labels = sorted(set(list(sdg_terms_add_validated.keys()) + list(sdg_terms_add_generated.keys())), key=lambda x: int(re.findall(r'\d+', x)[0]))
+sdg_labels = sorted(set(list(sdg_terms_add_validated.keys()) + list(sdg_terms_add_generated.keys())), key=sdg_label_sort)
 for sdg_label in sdg_labels:
     sdg_ontology_combined[sdg_label] = OrderedDict()
     validated_terms = sdg_terms_add_validated[sdg_label] if sdg_label in sdg_terms_add_validated.keys() else []
@@ -158,7 +158,7 @@ for sdg_label in sdg_labels:
     for term in sorted(list(set(validated_terms + generated_terms))):
         if term not in sdg_ontology_combined[sdg_label].keys():
             sdg_ontology_combined[sdg_label][term] = dict()
-        sdg_ontology_combined[sdg_label][term] = sorted(term_sources[sdg_label][term], key=lambda x: int(re.findall(r'\d+', x)[0]))
+        sdg_ontology_combined[sdg_label][term] = sorted(term_sources[sdg_label][term], key=sdg_label_sort)
 
 with open("CombinedOntology.json", "w") as file_:
     file_.write(json.dumps(sdg_ontology_combined))

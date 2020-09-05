@@ -1,11 +1,11 @@
 from multiprocessing import cpu_count
 from tqdm import tqdm
-from utils import process_fosname, levenshtein_ratio, sws
+from utils import process_fosname, levenshtein_ratio, sws, sdg_label_sort
 
 import concurrent.futures
 import json
 import pandas as pd
-import re
+
 
 with open("CombinedOntology.json", "r") as file_:
     sdg_terms = json.loads(file_.read())
@@ -79,7 +79,7 @@ for sdg_label, terms in sdg_terms.items():
                 sdg_matched_fos[sdg_label] = dict()
             sdg_matched_fos[sdg_label].update(matched_fos)
 
-sdg_labels = sorted(sdg_matched_fos.keys(), key=lambda x: int(re.findall(r'\d+', x)[0]))
+sdg_labels = sorted(sdg_matched_fos.keys(), key=sdg_label_sort)
 sdg_matched_fos = {
     sdg_label: {
         fos: sdg_matched_fos[sdg_label][fos] for fos in sorted(sdg_matched_fos[sdg_label].keys())
@@ -122,7 +122,7 @@ update_info = {
     'added_ids': [], 'added_names': [],
     'removed_ids': [], 'removed_names': []
 }
-for sdg_label in sorted(set(list(sdg_fos.keys()) + list(sdg_fos_old.keys())), key=lambda x: int(re.findall(r'\d+', x)[0])):
+for sdg_label in sorted(set(list(sdg_fos.keys()) + list(sdg_fos_old.keys())), key=sdg_label_sort):
     sdg_update_info = dict()
     
     try:

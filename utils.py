@@ -1,6 +1,7 @@
 from multiprocessing import Pool
 from tqdm import tqdm
 import numpy as np
+import re
 
 sws = set([
     'ourselves', 'should', 'often', 'does', 'this', 'beside', 'well',
@@ -105,3 +106,10 @@ def process_fosname(string):
         string = string[1:]
     return string
 
+
+def sdg_label_sort(sdg_label):
+    try:
+        sdg_nr = int(re.findall(r'\d+', x)[0])
+    except IndexError:
+        sdg_nr = sdg_label
+    return sdg_nr
