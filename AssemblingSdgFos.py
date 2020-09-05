@@ -4,10 +4,11 @@ from utils import process_fosname, levenshtein_ratio, sws
 
 import concurrent.futures
 import json
+import pandas as pd
 import re
 
 with open("CombinedOntology.json", "r") as file_:
-    sdg_keywords = json.loads(file_.read())
+    sdg_terms = json.loads(file_.read())
 
 with open("FOSMAP.json", "r") as file_:
     fos_map = json.loads(file_.read())
@@ -22,110 +23,99 @@ fos_to_match = [(fos_id, process_fosname(fos_name)) for fos_id, fos_name in fos_
 """
 
 
-def _match_keywords_to_fos(sdg_label, keywords, fos_to_match, sws, use_pbar, total):
-    sdg_matched_ids, sdg_matched_names = dict(), dict()
+def _match_terms_to_fos(sdg_label, terms, fos_to_match, sws, use_pbar, total):
+    sdg_matched_fos = dict()
     if use_pbar:
-        step = total // len(keywords)
-        total = step * len(keywords)
-        p_bar = tqdm(keywords, desc=f'Processing {sdg_label}', total=total, leave=True)
-    for keyword, sources in keywords:
-        matches_fos_ids, matched_fos_names = [], []
-        keyword_parts = list(filter(lambda w: w not in sws, keyword.split()))
+        step = total // len(terms)
+        total = step * len(terms)
+        p_bar = tqdm(terms, desc=f'Processing {sdg_label}', total=total, leave=True)
+    for term, sources in terms:
+        matches_fos = []
+        term_parts = list(filter(lambda w: w not in sws, term.split()))
         for fos_id, fos_name in fos_to_match:
-            if all(p in fos_name for p in keyword_parts) and levenshtein_ratio(keyword, fos_name) > 0.85:
-                matches_fos_ids.append(fos_id)
-                matched_fos_names.append(fos_name)
+            if all(p in fos_name for p in term_parts) and levenshtein_ratio(term, fos_name) > 0.85:
+                matches_fos.append([fos_id, fos_name])
 
-        sdg_matched_ids[keyword] = {
+        matched_fos = sorted(matched_fos, key=lambda x: x[1])
+        matched_fos_ids, matched_fos_names = list(map(lambda x: x[0], matched_fos)), list(map(lambda x: x[1], matched_fos))
+        sdg_matched_fos[term] = {
             "sources": sorted(sources),
-            "matchedFOS": sorted(matches_fos_ids)
+            "matched_FOS_ids": matched_fos_ids,
+            "matched_FOS_names": matched_fos_names
             }
-        sdg_matched_names[keyword] = {
-            "sources": sorted(sources),
-            "matchedFOS": sorted(matched_fos_names)
-            }
+
         if use_pbar:
             p_bar.update(step)
 
-    return sdg_label, sdg_matched_ids, sdg_matched_names
+    return sdg_label, sdg_matched_fos
 
 
 n_workers = cpu_count() - 1
 
-sdg_fos_ids, sdg_fos_names = dict(), dict()
-for sdg_label, keywords in sdg_keywords.items():
-    keywords = list(keywords.items())
-    keyword_batches = []
-    bs = (len(keywords) + n_workers - 1) // n_workers
+sdg_matched_fos = dict()
+for sdg_label, terms in sdg_terms.items():
+    terms = list(terms.items())
+    term_batches = []
+    bs = (len(terms) + n_workers - 1) // n_workers
     for i in range(n_workers):
-        batch = keywords[i*bs:(i+1)*bs]
+        batch = terms[i*bs:(i+1)*bs]
         if batch:
-            keyword_batches.append(batch)
+            term_batches.append(batch)
     with concurrent.futures.ProcessPoolExecutor(max_workers=n_workers) as executor:
         futures = []
-        for i, batch in enumerate(keyword_batches):
-            use_pbar = (i==len(keyword_batches)-2)
+        for i, batch in enumerate(term_batches):
+            use_pbar = i == (len(term_batches) - 2)
             futures.append(executor.submit(
-                _match_keywords_to_fos,
+                _match_terms_to_fos,
                 sdg_label, batch, fos_to_match[:], sws, 
-                use_pbar=use_pbar, total=len(keywords)
+                use_pbar=use_pbar, total=len(terms)
             ))
 
         for future in concurrent.futures.as_completed(futures):
-            sdg_label, matched_fos_ids, matched_fos_names = future.result()
-            if sdg_label not in sdg_fos_ids.keys():
-                sdg_fos_ids[sdg_label] = dict()
-            if sdg_label not in sdg_fos_names.keys():
-                sdg_fos_names[sdg_label] = dict()
-            sdg_fos_ids[sdg_label].update(matched_fos_ids)
-            sdg_fos_names[sdg_label].update(matched_fos_names)
+            sdg_label, matched_fos = future.result()
+            if sdg_label not in sdg_matched_fos.keys():
+                sdg_matched_fos[sdg_label] = dict()
+            sdg_matched_fos[sdg_label].update(matched_fos)
 
-sdg_labels = sorted(sdg_fos_ids.keys(), key=lambda x: re.findall(r'\d+', x)[0])
-sdg_fos_ids = {
+sdg_labels = sorted(sdg_matched_fos.keys(), key=lambda x: re.findall(r'\d+', x)[0])
+sdg_matched_fos = {
     sdg_label: {
-        fos: sdg_fos_ids[sdg_label][fos] for fos in sorted(sdg_fos_ids[sdg_label].keys())
-    } for sdg_label in sdg_labels
-}
-sdg_fos_names = {
-    sdg_label: {
-        fos: sdg_fos_names[sdg_label][fos] for fos in sorted(sdg_fos_names[sdg_label].keys())
+        fos: sdg_matched_fos[sdg_label][fos] for fos in sorted(sdg_matched_fos[sdg_label].keys())
     } for sdg_label in sdg_labels
 }
 
-with open("SDGFosIDs.json", "w") as file_:
-    json.dump(sdg_fos_ids, file_)
+with open("SdgMatchedFos.json", "w") as file_:
+    json.dump(sdg_matched_fos, file_)
 
-with open("SDGFosNames.json", "w") as file_:
-    json.dump(sdg_fos_names, file_)
 
-f_sdg_fos = dict()
-for sdg_label, sdg_fos_data in sdg_fos_ids.items():
+sdg_fos = dict()
+for sdg_label, sdg_term_data in sdg_matched_fos.items():
     foses = set()
-    for fos_data in list(sdg_fos_data.values()):
-        foses.update(fos_data["matchedFOS"])
-    f_sdg_fos[sdg_label] = sorted(list(foses))
+    for term_data in list(sdg_term_data.values()):
+        foses.update(term_data['matched_FOS_ids'])
+    sdg_fos[sdg_label] = sorted(list(foses))
 
 print('\n\n\t--- Percentage of matched fos ---')
-for sdg_label, sdg_fos_data in sdg_fos_ids.items():
-    c = sum(not fos_data["matchedFOS"] for fos_data in sdg_fos_data.values())
-    print(f'\t{sdg_label} - {100 - int(c * 100 / len(sdg_fos_data))}%')
+for sdg_label, sdg_term_data in sdg_matched_fos.items():
+    c = sum(not term_data["matchedFOS"] for term_data in sdg_term_data.values())
+    print(f'\t{sdg_label} - {100 - int(c * 100 / len(sdg_term_data))}%')
 
 print("\n\t--- Final FOS Count ---")
-for sdg_label, foses in f_sdg_fos.items():
+for sdg_label, foses in sdg_fos.items():
     print(f'\t{sdg_label} - {len(foses)}')
 
-with open('SDGFos.json', 'r') as file_:
+with open('SdgFos.json', 'r') as file_:
     sdg_fos_old = json.load(file_)
 
-with open('SDGFos_ver-min-1.json', 'w') as file_:
+with open('SdgFos_ver-min-1.json', 'w') as file_:
     json.dump(sdg_fos_old, file_)
 
-with open("SDGFos.json", "w") as file_:
-    json.dump(f_sdg_fos, file_)
+with open("SdgFos.json", "w") as file_:
+    json.dump(sdg_fos, file_)
 
 # Compare SDGFos.json to the last version
-update_info = dict()
-for sdg_label in sorted(set(list(f_sdg_fos.keys()) + list(sdg_fos_old.keys())), key=lambda x: re.findall(r'\d+', x)[0]):
+update_info = {'sdg': [], 'count_old': [], 'count_new': [], 'added': [], 'removed': []}
+for sdg_label in sorted(set(list(sdg_fos.keys()) + list(sdg_fos_old.keys())), key=lambda x: re.findall(r'\d+', x)[0]):
     sdg_update_info = dict()
     
     try:
@@ -133,19 +123,17 @@ for sdg_label in sorted(set(list(f_sdg_fos.keys()) + list(sdg_fos_old.keys())), 
     except KeyError:
         fos_old = []
     try:
-        fos_new = f_sdg_fos[sdg_label]
+        fos_new = sdg_fos[sdg_label]
     except KeyError:
         fos_new = []
 
     fos_add = list(set(fos_new).difference(fos_old))
     fos_remove = list(set(fos_old).difference(fos_new))
 
-    update_info[sdg_label] = {
-        'count_old': len(fos_old),
-        'count_new': len(fos_new),
-        'added': fos_add,
-        'removed': fos_remove
-    }
-
-with open('sdg_fos_update.json', 'w') as file_:
-    json.dump(update_info, file_)
+    update_info['sdg'].append(sdg_label)
+    update_info['count_old'].append(fos_old)
+    update_info['count_new'].append(fos_new)
+    update_info['added'].append(fos_add)
+    update_info['removed'].append(fos_remove)
+    
+pd.DataFrame(update_info).to_excel('UPDATE_INFO.xlsx', index=False)
