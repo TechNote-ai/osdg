@@ -116,7 +116,12 @@ with open("SdgFos.json", "w") as file_:
     json.dump(sdg_fos, file_)
 
 # Compare SDGFos.json to the last version
-update_info = {'sdg': [], 'count_old': [], 'count_new': [], 'added': [], 'removed': []}
+update_info = {
+    'sdg': [], 
+    'count_old': [], 'count_new': [], 
+    'added_ids': [], 'added_names': [],
+    'removed_ids': [], 'removed_names': []
+}
 for sdg_label in sorted(set(list(sdg_fos.keys()) + list(sdg_fos_old.keys())), key=lambda x: int(re.findall(r'\d+', x)[0])):
     sdg_update_info = dict()
     
@@ -133,9 +138,11 @@ for sdg_label in sorted(set(list(sdg_fos.keys()) + list(sdg_fos_old.keys())), ke
     fos_remove = list(set(fos_old).difference(fos_new))
 
     update_info['sdg'].append(sdg_label)
-    update_info['count_old'].append(fos_old)
-    update_info['count_new'].append(fos_new)
-    update_info['added'].append(fos_add)
-    update_info['removed'].append(fos_remove)
+    update_info['count_old'].append(len(fos_old))
+    update_info['count_new'].append(len(fos_new))
+    update_info['added_ids'].append(fos_add)
+    update_info['added_names'].append(list(map(lambda x: fos_map[x], fos_add)))
+    update_info['removed_ids'].append(fos_remove)
+    update_info['removed_names'].append(list(map(lambda x: fos_map[x], fos_remove)))
     
 pd.DataFrame(update_info).to_excel('UPDATE_INFO.xlsx', index=False)
