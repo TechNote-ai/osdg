@@ -46,6 +46,8 @@ def _match_terms_to_fos(sdg_label, terms, fos_to_match, sws, use_pbar, total):
 
         if use_pbar:
             p_bar.update(step)
+    if use_pbar:
+        p_bar.close()
 
     return sdg_label, sdg_matched_fos
 
@@ -77,7 +79,7 @@ for sdg_label, terms in sdg_terms.items():
                 sdg_matched_fos[sdg_label] = dict()
             sdg_matched_fos[sdg_label].update(matched_fos)
 
-sdg_labels = sorted(sdg_matched_fos.keys(), key=lambda x: re.findall(r'\d+', x)[0])
+sdg_labels = sorted(sdg_matched_fos.keys(), key=lambda x: int(re.findall(r'\d+', x)[0]))
 sdg_matched_fos = {
     sdg_label: {
         fos: sdg_matched_fos[sdg_label][fos] for fos in sorted(sdg_matched_fos[sdg_label].keys())
@@ -115,7 +117,7 @@ with open("SdgFos.json", "w") as file_:
 
 # Compare SDGFos.json to the last version
 update_info = {'sdg': [], 'count_old': [], 'count_new': [], 'added': [], 'removed': []}
-for sdg_label in sorted(set(list(sdg_fos.keys()) + list(sdg_fos_old.keys())), key=lambda x: re.findall(r'\d+', x)[0]):
+for sdg_label in sorted(set(list(sdg_fos.keys()) + list(sdg_fos_old.keys())), key=lambda x: int(re.findall(r'\d+', x)[0])):
     sdg_update_info = dict()
     
     try:
