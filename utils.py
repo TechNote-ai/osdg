@@ -109,7 +109,7 @@ def process_fosname(string):
 
 def sdg_label_sort(sdg_label):
     try:
-        sdg_nr = int(re.findall(r'\d+', x)[0])
+        sdg_nr = int(re.findall(r'\d+', sdg_label)[0])
     except IndexError:
         sdg_nr = sdg_label
     return sdg_nr
