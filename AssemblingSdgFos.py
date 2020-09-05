@@ -30,11 +30,11 @@ def _match_terms_to_fos(sdg_label, terms, fos_to_match, sws, use_pbar, total):
         total = step * len(terms)
         p_bar = tqdm(terms, desc=f'Processing {sdg_label}', total=total, leave=True)
     for term, sources in terms:
-        matches_fos = []
+        matched_fos = []
         term_parts = list(filter(lambda w: w not in sws, term.split()))
         for fos_id, fos_name in fos_to_match:
             if all(p in fos_name for p in term_parts) and levenshtein_ratio(term, fos_name) > 0.85:
-                matches_fos.append([fos_id, fos_name])
+                matched_fos.append([fos_id, fos_name])
 
         matched_fos = sorted(matched_fos, key=lambda x: x[1])
         matched_fos_ids, matched_fos_names = list(map(lambda x: x[0], matched_fos)), list(map(lambda x: x[1], matched_fos))
@@ -97,7 +97,7 @@ for sdg_label, sdg_term_data in sdg_matched_fos.items():
 
 print('\n\n\t--- Percentage of matched fos ---')
 for sdg_label, sdg_term_data in sdg_matched_fos.items():
-    c = sum(not term_data["matchedFOS"] for term_data in sdg_term_data.values())
+    c = sum(not term_data["matched_FOS_ids"] for term_data in sdg_term_data.values())
     print(f'\t{sdg_label} - {100 - int(c * 100 / len(sdg_term_data))}%')
 
 print("\n\t--- Final FOS Count ---")
