@@ -50,7 +50,7 @@ def _match_keywords_to_fos(sdg_label, keywords, fos_to_match, sws, use_pbar, tot
     return sdg_label, sdg_matched_ids, sdg_matched_names
 
 
-n_workers = cpu_count() - 3
+n_workers = cpu_count() - 1
 
 sdg_fos_ids, sdg_fos_names = dict(), dict()
 for sdg_label, keywords in sdg_keywords.items():
@@ -88,14 +88,14 @@ for sdg_label, sdg_fos_data in sdg_fos_ids.items():
     foses = set()
     for fos_data in list(sdg_fos_data.values()):
         foses.update(fos_data["matchedFOS"])
-    f_sdg_fos[sdg_label] = list(foses)
+    f_sdg_fos[sdg_label] = sorted(list(foses))
 
-print('\n\n--- Percentage of matched fos ---')
+print('\n\n\t--- Percentage of matched fos ---')
 for sdg_label, sdg_fos_data in sdg_fos_ids.items():
     c = sum(not fos_data["matchedFOS"] for fos_data in sdg_fos_data.values())
-    print(sdg_label, 100 - int(c * 100 / len(sdg_fos_data)), "%")
+    print(f'\t{sdg_label} - {100 - int(c * 100 / len(sdg_fos_data))}%')
 
-print("\n--- Final FOS Count ---")
+print("\n\t--- Final FOS Count ---")
 for sdg_label, foses in f_sdg_fos.items():
     print(f'\t{sdg_label} - {len(foses)}')
 
