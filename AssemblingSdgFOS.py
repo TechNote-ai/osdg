@@ -25,9 +25,9 @@ def process_add_all_to_all_fos():
         with open(f'{directory}/{processed_sdg_fos_fname}', 'r') as file_:
             processed_sdg_fos = json.load(file_)
         for sdg_label, fos in processed_sdg_fos.items():
-            if sdg_label in processed_fos.keys():
+            if sdg_label not in processed_fos.keys():
                 processed_fos[sdg_label] = set()
-            processed_fos[sdg_label].update(fos)
+            processed_fos[sdg_label].update(map(lambda x: tuple(x), fos))
     return processed_fos
 
 
@@ -35,11 +35,12 @@ def process_replace_fos():
     replace_fos = []
 
     path = 'raw_data/1_replace'
-    add_replace_data_paths = [
+    add_replace_data_paths = sorted([
         f'{path}/{directory_name}'
-        for directory_name in sorted(os.listdir(path), key=lambda x: int(x.split('_')[0]))
+        for directory_name in os.listdir(path) 
         if '.' not in directory_name
-        ]
+        ], key=lambda x: int(x.split('/')[1].split('_')[0]))
+
     for directory in add_replace_data_paths:
         try:
             processed_replace_fos_fname = list(filter(lambda oname: '_ReplaceFOS.json' in oname, os.listdir(directory)))[0]
@@ -56,7 +57,7 @@ def process_replace_fos():
 def process_remove_fos():
     remove_fos = dict()
 
-    path = 'raw_data/_remove'
+    path = 'raw_data/2_remove'
     add_remove_data_paths = [
         f'{path}/{directory_name}'
         for directory_name in os.listdir(path)
@@ -66,7 +67,7 @@ def process_remove_fos():
         try:
             processed_remove_fos_fname = list(filter(lambda oname: '_RemoveFOS.json' in oname, os.listdir(directory)))[0]
         except IndexError:
-            print('Sdg replace FOS are not processed in {directory}')
+            print('Sdg remove FOS are not processed in {directory}')
             continue
         with open(f'{directory}/{processed_remove_fos_fname}', 'r') as file_:
             processed_remove_fos = json.load(file_)
@@ -127,6 +128,7 @@ def _match_terms_to_fos(sdg_label, terms, fos_to_match, sws, use_pbar, total):
 
 n_workers = cpu_count() - 1
 for sdg_label, terms in sdg_terms.items():
+    if sdg_label_sort(sdg_label) not in range(10, 11): continue
     terms = list(terms.items())
     term_batches = []
     bs = (len(terms) + n_workers - 1) // n_workers
@@ -177,7 +179,7 @@ for sdg_label, sdg_term_data in sdg_matched_fos.items():
 """
 processed_all_to_all_fos = process_add_all_to_all_fos()
 for sdg_label, foses in processed_all_to_all_fos.items():
-    fos_ids = list(map(lambda fos: fos[0]))
+    fos_ids = list(map(lambda fos: fos[0], foses))
     if sdg_label not in sdg_fos.keys():
         sdg_fos[sdg_label] = set()
     sdg_fos[sdg_label].update(fos_ids)
@@ -187,22 +189,23 @@ for sdg_label, foses in processed_all_to_all_fos.items():
     Replacing 1_replace/ FOS
 """
 data_replaced_fos = {'fos_id': [], 'fos_name': [], 'from_sdg': [], 'to_sdg': []}
-processed_replace_fos = process_remove_fos()
-for fos_id, (from_sdg, to_sdg) in processed_replace_fos:
-    try:
-        sdg_fos[from_sdg].remove(fos_id)
-    except KeyError:
-        from_sdg = ''
-        pass
-    sdg_fos[to_sdg].add(fos_id)
+processed_replace_fos = process_replace_fos()
+for fos_id, moves in processed_replace_fos:
+    for from_sdg, to_sdg in moves:
+        try:
+            sdg_fos[from_sdg].remove(fos_id)
+        except KeyError:
+            from_sdg = ''
+            pass
+        sdg_fos[to_sdg].add(fos_id)
 
-    fos_name = fos_map.get(fos_id)
-    if not fos_name:
-        fos_name = ''
-    data_replaced_fos['fos_id'].append(fos_id)
-    data_replaced_fos['fos_name'].append(fos_name)
-    data_replaced_fos['from_sdg'].append(from_sdg)
-    data_replaced_fos['to_sdg'].append(to_sdg)
+        fos_name = fos_map.get(fos_id)
+        if not fos_name:
+            fos_name = ''
+        data_replaced_fos['fos_id'].append(fos_id)
+        data_replaced_fos['fos_name'].append(fos_name)
+        data_replaced_fos['from_sdg'].append(from_sdg)
+        data_replaced_fos['to_sdg'].append(to_sdg)
 
 pd.DataFrame(data_replaced_fos).sort_values(['from_sdg', 'to_sdg', 'fos_name']).to_excel(
     'raw_data/1_replace/ReplacedFOS.xlsx', index=False
@@ -212,13 +215,17 @@ pd.DataFrame(data_replaced_fos).sort_values(['from_sdg', 'to_sdg', 'fos_name']).
     Removing 2_remove/ FOS
 """
 data_removed_fos = {'sdg_label': [], 'fos_id': [], 'fos_name': []}
-removed_fos = set()
+removed_fos = dict()
 processed_remove_fos = process_remove_fos()
 for sdg_label, fos_to_remove in processed_remove_fos.items():
     if sdg_label not in removed_fos.keys():
         removed_fos[sdg_label] = set()
-    removed_fos[sdg_label].update(sdg_fos[sdg_label].intersection(fos_to_remove))
-    sdg_fos[sdg_label] = sdg_fos[sdg_label].difference(fos_to_remove)
+
+    if sdg_label in sdg_fos.keys():
+        removed_fos[sdg_label].update(sdg_fos[sdg_label].intersection(fos_to_remove))
+        sdg_fos[sdg_label] = sdg_fos[sdg_label].difference(fos_to_remove)
+    else:
+        removed_fos[sdg_label] = []
 
 for sdg_label, rm_fos_ids in removed_fos.items():
     for fos_id in rm_fos_ids:
@@ -236,8 +243,8 @@ pd.DataFrame(data_removed_fos).sort_values(['sdg_label', 'fos_name']).to_excel(
 """
     Writing to file
 """
-for sdg_label, foses in sdg_fos.items():
-    sdg_fos[sdg_label] = sorted(list(foses))
+for sdg_label, fos_ids in sdg_fos.items():
+    sdg_fos[sdg_label] = sorted(map(lambda fos_id: int(fos_id), fos_ids))
 
 print("\n\t--- Final FOS Count ---")
 for sdg_label, foses in sdg_fos.items():

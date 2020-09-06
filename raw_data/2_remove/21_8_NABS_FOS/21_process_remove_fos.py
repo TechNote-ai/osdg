@@ -8,5 +8,5 @@ remove_fos = {
     for sdg_nr in range(1, 18)
 }
 
-with open('21_RemoveFos.json', 'w') as file_:
+with open('21_RemoveFOS.json', 'w') as file_:
     json.dump(remove_fos, file_)

@@ -12,5 +12,5 @@ for sdg_to_remove, fos_id in df[['remove', 'fos_id']].values:
             remove_fos[sdg_label] = []
         remove_fos[sdg_label].append(fos_id)
 
-with open('22_RemoveFos.json', 'w') as file_:
+with open('22_RemoveFOS.json', 'w') as file_:
     json.dump(remove_fos, file_)
