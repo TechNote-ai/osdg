@@ -290,8 +290,8 @@ for sdg_label in sorted(set(list(sdg_fos.keys()) + list(sdg_fos_old.keys())), ke
     update_info['count_old'].append(len(fos_old))
     update_info['count_new'].append(len(fos_new))
     update_info['added_ids'].append(fos_add)
-    update_info['added_names'].append(list(map(lambda x: fos_map_700[x], fos_add)))
+    update_info['added_names'].append(list(map(lambda x: fos_map_700[str(x)], fos_add)))
     update_info['removed_ids'].append(fos_remove)
-    update_info['removed_names'].append(list(map(lambda x: fos_map_700[x], fos_remove)))
+    update_info['removed_names'].append(list(map(lambda x: fos_map_700[str(x)], fos_remove)))
     
 pd.DataFrame(update_info).to_excel('UPDATE_INFO.xlsx', index=False)
