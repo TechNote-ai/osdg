@@ -38,7 +38,7 @@ for directory in add_validated_data_paths:
             processed_sdg_terms = json.load(file_)
         processed_sdg_terms = {sdg_label: processed_sdg_terms[sdg_label] for sdg_label in sorted(processed_sdg_terms.keys())}
     except IndexError:
-        print('Sdg Terms are not processed in {directory}')
+        print(f'Sdg Terms are not processed in {directory}')
         continue
 
     for sdg_label, terms in processed_sdg_terms.items():
@@ -62,7 +62,7 @@ for directory in add_all_to_all_data_paths:
             processed_sdg_fos = json.load(file_)
         processed_sdg_fos = {sdg_label: processed_sdg_fos[sdg_label] for sdg_label in sorted(processed_sdg_fos.keys())}
     except IndexError:
-        print('Sdg FOS are not processed in {directory}')
+        print(f'Sdg FOS are not processed in {directory}')
         continue
 
     for sdg_label, foses in processed_sdg_fos.items():
@@ -99,7 +99,7 @@ for directory in add_generated_data_paths:
             processed_sdg_terms = json.load(file_)
         processed_sdg_terms = {sdg_label: processed_sdg_terms[sdg_label] for sdg_label in sorted(processed_sdg_terms.keys())}
     except IndexError:
-        print('Sdg Terms are not processed in {directory}')
+        print(f'Sdg Terms are not processed in {directory}')
         continue
 
     for sdg_label, terms in processed_sdg_terms.items():
