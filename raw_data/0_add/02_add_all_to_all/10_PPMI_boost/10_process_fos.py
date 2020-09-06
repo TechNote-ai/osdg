@@ -59,7 +59,7 @@ print("Overall : ", counter)
 for key, value in sdg_words.items():
     sdg_words[key] = pre_proc(set(value))
 
-with open("10_ProcessedFos.json", "w") as file_:
+with open("10_ProcessedFOS.json", "w") as file_:
     file_.write(json.dumps(sdg_words))
 
 counter = 0

@@ -4,7 +4,7 @@ import json
 import pandas as pd
 
 
-FNAME_PROCESSED_KEY_TERMS = "8_ProcessedFos.json"
+FNAME_PROCESSED_KEY_TERMS = "8_ProcessedFOS.json"
 
 
 replacables_symbols = ["&", "-", '"', "  "]

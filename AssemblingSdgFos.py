@@ -4,7 +4,79 @@ from utils import process_fosname, levenshtein_ratio, sws, sdg_label_sort
 
 import concurrent.futures
 import json
+import os
 import pandas as pd
+
+
+def process_add_all_to_all_fos():
+    path = 'raw_data/0_add/02_add_all_to_all'
+    processed_fos = dict()
+    add_all_to_all_data_paths = [
+        f'{path}/{directory_name}'
+        for directory_name in os.listdir(path)
+        if '.' not in directory_name
+        ]
+    for directory in add_all_to_all_data_paths:
+        try:
+            processed_sdg_fos_fname = list(filter(lambda oname: '_ProcessedFOS.json' in oname, os.listdir(directory)))[0]
+        except IndexError:
+            print('Sdg FOS are not processed in {directory}')
+            continue
+        with open(f'{directory}/{processed_sdg_fos_fname}', 'r') as file_:
+            processed_sdg_fos = json.load(file_)
+        for sdg_label, fos in processed_sdg_fos.items():
+            if sdg_label in processed_fos.keys():
+                processed_fos[sdg_label] = set()
+            processed_fos[sdg_label].update(fos)
+    return processed_fos
+
+
+def process_replace_fos():
+    replace_fos = []
+
+    path = 'raw_data/1_replace'
+    add_replace_data_paths = [
+        f'{path}/{directory_name}'
+        for directory_name in sorted(os.listdir(path), key=lambda x: int(x.split('_')[0]))
+        if '.' not in directory_name
+        ]
+    for directory in add_replace_data_paths:
+        try:
+            processed_replace_fos_fname = list(filter(lambda oname: '_ReplaceFOS.json' in oname, os.listdir(directory)))[0]
+        except IndexError:
+            print('Sdg replace FOS are not processed in {directory}')
+            continue
+        with open(f'{directory}/{processed_replace_fos_fname}', 'r') as file_:
+            processed_replace_fos = json.load(file_)
+        replace_fos += list(processed_replace_fos.items())
+
+    return replace_fos
+
+
+def process_remove_fos():
+    remove_fos = dict()
+
+    path = 'raw_data/_remove'
+    add_remove_data_paths = [
+        f'{path}/{directory_name}'
+        for directory_name in os.listdir(path)
+        if '.' not in directory_name
+        ]
+    for directory in add_remove_data_paths:
+        try:
+            processed_remove_fos_fname = list(filter(lambda oname: '_RemoveFOS.json' in oname, os.listdir(directory)))[0]
+        except IndexError:
+            print('Sdg replace FOS are not processed in {directory}')
+            continue
+        with open(f'{directory}/{processed_remove_fos_fname}', 'r') as file_:
+            processed_remove_fos = json.load(file_)
+
+        for sdg_label, fos_ids in processed_remove_fos.items():
+            if sdg_label not in remove_fos.keys():
+                remove_fos[sdg_label] = set()
+            remove_fos[sdg_label].update(fos_ids)
+        
+    return remove_fos
 
 
 with open("CombinedOntology.json", "r") as file_:
@@ -21,6 +93,7 @@ fos_to_match = [(fos_id, process_fosname(fos_name)) for fos_id, fos_name in fos_
         all tokens from a concept must be present in FOS name
         levenstein similarity between concept and FOS name must be > 0.85
 """
+sdg_matched_fos = dict()
 
 
 def _match_terms_to_fos(sdg_label, terms, fos_to_match, sws, use_pbar, total):
@@ -53,8 +126,6 @@ def _match_terms_to_fos(sdg_label, terms, fos_to_match, sws, use_pbar, total):
 
 
 n_workers = cpu_count() - 1
-
-sdg_matched_fos = dict()
 for sdg_label, terms in sdg_terms.items():
     terms = list(terms.items())
     term_batches = []
@@ -85,8 +156,7 @@ sdg_matched_fos = {
         fos: sdg_matched_fos[sdg_label][fos] for fos in sorted(sdg_matched_fos[sdg_label].keys())
     } for sdg_label in sdg_labels
 }
-
-with open("SdgMatchedFos.json", "w") as file_:
+with open("SdgMatchedFOS.json", "w") as file_:
     json.dump(sdg_matched_fos, file_)
 
 
@@ -95,27 +165,96 @@ for sdg_label, sdg_term_data in sdg_matched_fos.items():
     foses = set()
     for term_data in list(sdg_term_data.values()):
         foses.update(term_data['matched_FOS_ids'])
-    sdg_fos[sdg_label] = sorted(list(foses))
 
-print('\n\n\t--- Percentage of matched fos ---')
+print('\n\n\t--- Percentage of matched FOS ---')
 for sdg_label, sdg_term_data in sdg_matched_fos.items():
     c = sum(not term_data["matched_FOS_ids"] for term_data in sdg_term_data.values())
     print(f'\t{sdg_label} - {100 - int(c * 100 / len(sdg_term_data))}%')
+
+
+"""
+    Adding 0_add/02_all_to_all FOS
+"""
+processed_all_to_all_fos = process_add_all_to_all_fos()
+for sdg_label, foses in processed_all_to_all_fos.items():
+    fos_ids = list(map(lambda fos: fos[0]))
+    if sdg_label not in sdg_fos.keys():
+        sdg_fos[sdg_label] = set()
+    sdg_fos[sdg_label].update(fos_ids)
+
+
+"""
+    Replacing 1_replace/ FOS
+"""
+data_replaced_fos = {'fos_id': [], 'fos_name': [], 'from_sdg': [], 'to_sdg': []}
+processed_replace_fos = process_remove_fos()
+for fos_id, (from_sdg, to_sdg) in processed_replace_fos:
+    try:
+        sdg_fos[from_sdg].remove(fos_id)
+    except KeyError:
+        from_sdg = ''
+        pass
+    sdg_fos[to_sdg].add(fos_id)
+
+    fos_name = fos_map.get(fos_id)
+    if not fos_name:
+        fos_name = ''
+    data_replaced_fos['fos_id'].append(fos_id)
+    data_replaced_fos['fos_name'].append(fos_name)
+    data_replaced_fos['from_sdg'].append(from_sdg)
+    data_replaced_fos['to_sdg'].append(to_sdg)
+
+pd.DataFrame(data_replaced_fos).sort_values(['from_sdg', 'to_sdg', 'fos_name']).to_excel(
+    'raw_data/1_replace/ReplacedFOS.xlsx', index=False
+    )
+
+"""
+    Removing 2_remove/ FOS
+"""
+data_removed_fos = {'sdg_label': [], 'fos_id': [], 'fos_name': []}
+removed_fos = set()
+processed_remove_fos = process_remove_fos()
+for sdg_label, fos_to_remove in processed_remove_fos.items():
+    if sdg_label not in removed_fos.keys():
+        removed_fos[sdg_label] = set()
+    removed_fos[sdg_label].update(sdg_fos[sdg_label].intersection(fos_to_remove))
+    sdg_fos[sdg_label] = sdg_fos[sdg_label].difference(fos_to_remove)
+
+for sdg_label, rm_fos_ids in removed_fos.items():
+    for fos_id in rm_fos_ids:
+        fos_name = fos_map.get(fos_id)
+        if not fos_name:
+            fos_name = ''
+        data_removed_fos['sdg_label'].append(sdg_label)
+        data_removed_fos['fos_id'].append(fos_id)
+        data_removed_fos['fos_name'].append(fos_name)
+    
+pd.DataFrame(data_removed_fos).sort_values(['sdg_label', 'fos_name']).to_excel(
+    'raw_data/2_remove/RemovedFOS.xlsx', index=False
+    )
+
+"""
+    Writing to file
+"""
+for sdg_label, foses in sdg_fos.items():
+    sdg_fos[sdg_label] = sorted(list(foses))
 
 print("\n\t--- Final FOS Count ---")
 for sdg_label, foses in sdg_fos.items():
     print(f'\t{sdg_label} - {len(foses)}')
 
-with open('SdgFos.json', 'r') as file_:
+with open('SdgFOS.json', 'r') as file_:
     sdg_fos_old = json.load(file_)
 
-with open('SdgFos_ver-min-1.json', 'w') as file_:
+with open('SdgFOS_ver-min-1.json', 'w') as file_:
     json.dump(sdg_fos_old, file_)
 
-with open("SdgFos.json", "w") as file_:
+with open("SdgFOS.json", "w") as file_:
     json.dump(sdg_fos, file_)
 
-# Compare SDGFos.json to the last version
+""" 
+    Comparing to the last SdgFOS.json version 
+"""
 update_info = {
     'sdg': [], 
     'count_old': [], 'count_new': [], 

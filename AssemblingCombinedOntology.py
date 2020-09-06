@@ -57,12 +57,12 @@ for directory in add_validated_data_paths:
 # All to all    # TODO leave it for matching? if not, it goes into assembling sdg_fos_script. Must be checked for conflicts when assembling generated
 for directory in add_all_to_all_data_paths:
     try:
-        processed_sdg_fos_fname = list(filter(lambda oname: '_ProcessedFos.json' in oname, os.listdir(directory)))[0]
+        processed_sdg_fos_fname = list(filter(lambda oname: '_ProcessedFOS.json' in oname, os.listdir(directory)))[0]
         with open(f'{directory}/{processed_sdg_fos_fname}', 'r') as file_:
             processed_sdg_fos = json.load(file_)
         processed_sdg_fos = {sdg_label: processed_sdg_fos[sdg_label] for sdg_label in sorted(processed_sdg_fos.keys())}
     except IndexError:
-        print('Sdg Fos are not processed in {directory}')
+        print('Sdg FOS are not processed in {directory}')
         continue
 
     for sdg_label, foses in processed_sdg_fos.items():
