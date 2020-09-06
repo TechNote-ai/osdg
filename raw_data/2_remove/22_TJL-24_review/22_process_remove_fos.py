@@ -10,7 +10,7 @@ for sdg_to_remove, fos_id in df[['remove', 'fos_id']].values:
     for sdg_label in sdg_to_remove:
         if sdg_label not in remove_fos.keys():
             remove_fos[sdg_label] = []
-        remove_fos[sdg_label].append(fos_id)
+        remove_fos[sdg_label].append(str(fos_id))
 
 with open('22_RemoveFOS.json', 'w') as file_:
     json.dump(remove_fos, file_)
