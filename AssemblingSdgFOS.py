@@ -263,28 +263,12 @@ with open("SdgFOS.json", "w") as file_:
 """ 
     Comparing to the last SdgFOS.json version 
 """
-# import json
-# import pandas as pd
-
-# with open('SDGFosOld.json', 'r') as f:
-#     sdg_fos_old = json.load(f)
-
-# with open('SdgFOS.json', 'r') as f:
-#     sdg_fos = json.load(f)
-
-# from utils import sdg_label_sort
-# with open('FOSMAP_700.json', 'r') as file_:
-#     fos_map_700 = json.load(file_)
-
 update_info = {
     'sdg': [], 
-    'count_old': [], 'count_new': [], 
-    'added_ids': [], 'added_names': [],
-    'removed_ids': [], 'removed_names': []
+    'new_fos_id': [], 'new_fos_name': [],
+    'removed_fos_id': [], 'removed_fos_name': []
 }
 for sdg_label in sorted(set(list(sdg_fos.keys()) + list(sdg_fos_old.keys())), key=sdg_label_sort):
-    sdg_update_info = dict()
-    
     try:
         fos_old = sdg_fos_old[sdg_label]
     except KeyError:
@@ -295,14 +279,25 @@ for sdg_label in sorted(set(list(sdg_fos.keys()) + list(sdg_fos_old.keys())), ke
         fos_new = []
 
     fos_add = list(set(fos_new).difference(fos_old))
-    fos_remove = list(set(fos_old).difference(fos_new))
+    fos_removed = list(set(fos_old).difference(fos_new))
 
-    update_info['sdg'].append(sdg_label)
-    update_info['count_old'].append(len(fos_old))
-    update_info['count_new'].append(len(fos_new))
-    update_info['added_ids'].append(fos_add)
-    update_info['added_names'].append(list(map(lambda fos_id: fos_map.get(fos_id, '__unknown__'), fos_add)))
-    update_info['removed_ids'].append(fos_remove)
-    update_info['removed_names'].append(list(map(lambda fos_id: fos_map.get(fos_id, '__unknown__'), fos_remove)))
+    print('\tSDG\tCOUNT_OLD\tCOUNT_NEW')
+    print(f'\t{sdg_label}\t{len(fos_old)}\t{len(fos_new)}')
+
+    for fos_id, fos_name in zip(fos_add, list(map(lambda fos_id: fos_map_700.get(fos_id, '__unknown__'), fos_add))):
+        update_info['sdg'].append(sdg_label)
+        update_info['new_fos_id'].append(fos_id)
+        update_info['new_fos_name'].append(fos_name)
+        update_info['removed_fos_id'].append('')
+        update_info['removed_fos_name'].append('')
+
+    for fos_id, fos_name in zip(fos_removed, list(map(lambda fos_id: fos_map_700.get(fos_id, '__unknown__'), fos_removed))):
+        update_info['sdg'].append(sdg_label)
+        update_info['new_fos_id'].append('')
+        update_info['new_fos_name'].append('')
+        update_info['removed_fos_id'].append(fos_id)
+        update_info['removed_fos_name'].append(fos_name)
     
-pd.DataFrame(update_info).to_excel('UPDATE_INFO.xlsx', index=False)
+pd.DataFrame(update_info).sort_values(['sdg', 'new_fos_name', 'removed_fos_name']).to_excel(
+    'UPDATE_INFO.xlsx', index=False
+    )
