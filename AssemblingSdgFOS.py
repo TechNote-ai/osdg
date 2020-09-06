@@ -178,8 +178,8 @@ for sdg_label, sdg_term_data in sdg_matched_fos.items():
 """
 processed_all_to_all_fos = process_add_all_to_all_fos()
 for sdg_label, foses in processed_all_to_all_fos.items():
-    for fos_id, fos_name in foses:
-        fos_map[int(fos_id)] = fos_name
+#    for fos_id, fos_name in foses:
+#        fos_map[int(fos_id)] = fos_name
     fos_ids = list(map(lambda fos: fos[0], foses))
     if sdg_label not in sdg_fos.keys():
         sdg_fos[sdg_label] = set()
