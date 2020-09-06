@@ -128,7 +128,6 @@ def _match_terms_to_fos(sdg_label, terms, fos_to_match, sws, use_pbar, total):
 
 n_workers = cpu_count() - 1
 for sdg_label, terms in sdg_terms.items():
-    if sdg_label_sort(sdg_label) not in range(10, 11): continue
     terms = list(terms.items())
     term_batches = []
     bs = (len(terms) + n_workers - 1) // n_workers
@@ -198,7 +197,6 @@ for fos_id, moves in processed_replace_fos:
             sdg_fos[from_sdg].remove(fos_id)
         except KeyError:
             from_sdg = ''
-            pass
         sdg_fos[to_sdg].add(fos_id)
 
         fos_name = fos_map.get(fos_id)
