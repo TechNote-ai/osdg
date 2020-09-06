@@ -114,7 +114,7 @@ def _match_terms_to_fos(sdg_label, terms, fos_to_match, sws, use_pbar, total):
                 matched_fos.append([fos_id, fos_name])
 
         matched_fos = sorted(matched_fos, key=lambda x: x[1])
-        matched_fos_ids, matched_fos_names = list(map(lambda x: x[0], matched_fos)), list(map(lambda x: x[1], matched_fos))
+        matched_fos_ids, matched_fos_names = list(map(lambda x: str(x[0]), matched_fos)), list(map(lambda x: x[1], matched_fos))
         sdg_matched_fos[term] = {
             "sources": sorted(sources),
             "matched_FOS_ids": matched_fos_ids,
@@ -260,10 +260,22 @@ with open('SdgFOS_ver-min-1.json', 'w') as file_:
 with open("SdgFOS.json", "w") as file_:
     json.dump(sdg_fos, file_)
 
+
 """ 
     Comparing to the last SdgFOS.json version 
 """
+# import json
+# import pandas as pd
 
+# with open('SDGFosOld.json', 'r') as f:
+#     sdg_fos_old = json.load(f)
+
+# with open('SdgFOS.json', 'r') as f:
+#     sdg_fos = json.load(f)
+
+# from utils import sdg_label_sort
+# with open('FOSMAP_700.json', 'r') as file_:
+#     fos_map_700 = json.load(file_)
 
 def fos_id_to_name(fos_id):
     fos_name = fos_map_700.get(str(fos_id))
@@ -302,3 +314,5 @@ for sdg_label in sorted(set(list(sdg_fos.keys()) + list(sdg_fos_old.keys())), ke
     update_info['removed_names'].append(list(map(fos_id_to_name, fos_remove)))
     
 pd.DataFrame(update_info).to_excel('UPDATE_INFO.xlsx', index=False)
+
+# %%
