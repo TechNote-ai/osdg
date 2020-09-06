@@ -83,6 +83,9 @@ def process_remove_fos():
 with open("CombinedOntology.json", "r") as file_:
     sdg_terms = json.loads(file_.read())
 
+with open('FOSMAP_700.json', 'r') as file_:
+    fos_map_700 = json.load(file_)
+
 with open("FOSMAP.json", "r") as file_:
     fos_map = json.loads(file_.read())
 fos_to_match = [(fos_id, process_fosname(fos_name)) for fos_id, fos_name in fos_map.items()]
@@ -178,8 +181,6 @@ for sdg_label, sdg_term_data in sdg_matched_fos.items():
 """
 processed_all_to_all_fos = process_add_all_to_all_fos()
 for sdg_label, foses in processed_all_to_all_fos.items():
-#    for fos_id, fos_name in foses:
-#        fos_map[int(fos_id)] = fos_name
     fos_ids = list(map(lambda fos: fos[0], foses))
     if sdg_label not in sdg_fos.keys():
         sdg_fos[sdg_label] = set()
@@ -199,7 +200,7 @@ for fos_id, moves in processed_replace_fos:
             from_sdg = ''
         sdg_fos[to_sdg].add(fos_id)
 
-        fos_name = fos_map.get(fos_id)
+        fos_name = fos_map_700.get(str(fos_id))
         if not fos_name:
             fos_name = ''
         data_replaced_fos['fos_id'].append(fos_id)
@@ -229,7 +230,7 @@ for sdg_label, fos_to_remove in processed_remove_fos.items():
 
 for sdg_label, rm_fos_ids in removed_fos.items():
     for fos_id in rm_fos_ids:
-        fos_name = fos_map.get(fos_id)
+        fos_name = fos_map_700.get(str(fos_id))
         if not fos_name:
             fos_name = ''
         data_removed_fos['sdg_label'].append(sdg_label)
@@ -262,8 +263,7 @@ with open("SdgFOS.json", "w") as file_:
 """ 
     Comparing to the last SdgFOS.json version 
 """
-with open('FOSMAP_700.json', 'r') as file_:
-    fos_map_700 = json.load(file_)
+
 
 def fos_id_to_name(fos_id):
     fos_name = fos_map_700.get(str(fos_id))
