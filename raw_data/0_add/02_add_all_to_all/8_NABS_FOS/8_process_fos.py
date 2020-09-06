@@ -45,7 +45,7 @@ if __name__ == '__main__':
         sdg_label = f'SDG_{sdg_nr}'
         if sdg_label not in sdg_fos.keys():
             sdg_fos[sdg_label] = []
-        sdg_fos[sdg_label].append((fos_id, fos_name))
+        sdg_fos[sdg_label].append((str(fos_id), fos_name))
 
     for sdg_label, foses in sdg_fos.items():
         sdg_fos[sdg_label] = pre_proc(foses)

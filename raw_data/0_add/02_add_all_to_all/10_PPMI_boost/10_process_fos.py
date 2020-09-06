@@ -45,7 +45,7 @@ for row in dfl:
         sdg = f"SDG_{int(row['SDG number'])}"
         if sdg not in sdg_words.keys():
             sdg_words[sdg] = []
-        sdg_words[sdg].append((row['FOS number'], row["FOS name"]))
+        sdg_words[sdg].append((str(row['FOS number']), row["FOS name"]))
 
 
 counter = 0
