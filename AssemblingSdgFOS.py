@@ -111,10 +111,10 @@ def _match_terms_to_fos(sdg_label, terms, fos_to_match, sws, use_pbar, total):
         term_parts = list(filter(lambda w: w not in sws, term.split()))
         for fos_id, fos_name in fos_to_match:
             if all(p in fos_name for p in term_parts) and levenshtein_ratio(term, fos_name) > 0.85:
-                matched_fos.append([fos_id, fos_name])
+                matched_fos.append([str(fos_id), fos_name])
 
         matched_fos = sorted(matched_fos, key=lambda x: x[1])
-        matched_fos_ids, matched_fos_names = list(map(lambda x: str(x[0]), matched_fos)), list(map(lambda x: x[1], matched_fos))
+        matched_fos_ids, matched_fos_names = list(map(lambda x: x[0], matched_fos)), list(map(lambda x: x[1], matched_fos))
         sdg_matched_fos[term] = {
             "sources": sorted(sources),
             "matched_FOS_ids": matched_fos_ids,
@@ -169,6 +169,7 @@ for sdg_label, sdg_term_data in sdg_matched_fos.items():
     foses = set()
     for term_data in list(sdg_term_data.values()):
         foses.update(term_data['matched_FOS_ids'])
+    sdg_fos[sdg_label] = foses
 
 print('\n\n\t--- Percentage of matched FOS ---')
 for sdg_label, sdg_term_data in sdg_matched_fos.items():
@@ -193,6 +194,7 @@ for sdg_label, foses in processed_all_to_all_fos.items():
 data_replaced_fos = {'fos_id': [], 'fos_name': [], 'from_sdg': [], 'to_sdg': []}
 processed_replace_fos = process_replace_fos()
 for fos_id, moves in processed_replace_fos:
+    fos_name = fos_map_700.get(fos_id, '')
     for from_sdg, to_sdg in moves:
         try:
             sdg_fos[from_sdg].remove(fos_id)
@@ -200,9 +202,6 @@ for fos_id, moves in processed_replace_fos:
             from_sdg = ''
         sdg_fos[to_sdg].add(fos_id)
 
-        fos_name = fos_map_700.get(str(fos_id))
-        if not fos_name:
-            fos_name = ''
         data_replaced_fos['fos_id'].append(fos_id)
         data_replaced_fos['fos_name'].append(fos_name)
         data_replaced_fos['from_sdg'].append(from_sdg)
@@ -245,7 +244,7 @@ pd.DataFrame(data_removed_fos).sort_values(['sdg_label', 'fos_name']).to_excel(
     Writing to file
 """
 for sdg_label, fos_ids in sdg_fos.items():
-    sdg_fos[sdg_label] = sorted(map(lambda fos_id: int(fos_id), fos_ids))
+    sdg_fos[sdg_label] = sorted(fos_ids)
 
 print("\n\t--- Final FOS Count ---")
 for sdg_label, foses in sdg_fos.items():
@@ -277,13 +276,6 @@ with open("SdgFOS.json", "w") as file_:
 # with open('FOSMAP_700.json', 'r') as file_:
 #     fos_map_700 = json.load(file_)
 
-def fos_id_to_name(fos_id):
-    fos_name = fos_map_700.get(str(fos_id))
-    if fos_name:
-        return fos_name
-    print(f"FOS '{fos_id}' not found in fos map 700.")
-    return '__unknown__'
-
 update_info = {
     'sdg': [], 
     'count_old': [], 'count_new': [], 
@@ -309,10 +301,8 @@ for sdg_label in sorted(set(list(sdg_fos.keys()) + list(sdg_fos_old.keys())), ke
     update_info['count_old'].append(len(fos_old))
     update_info['count_new'].append(len(fos_new))
     update_info['added_ids'].append(fos_add)
-    update_info['added_names'].append(list(map(fos_id_to_name, fos_add)))
+    update_info['added_names'].append(list(map(lambda fos_id: fos_map.get(fos_id, '__unknown__'), fos_add)))
     update_info['removed_ids'].append(fos_remove)
-    update_info['removed_names'].append(list(map(fos_id_to_name, fos_remove)))
+    update_info['removed_names'].append(list(map(lambda fos_id: fos_map.get(fos_id, '__unknown__'), fos_remove)))
     
 pd.DataFrame(update_info).to_excel('UPDATE_INFO.xlsx', index=False)
-
-# %%
