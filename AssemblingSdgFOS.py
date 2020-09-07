@@ -28,6 +28,7 @@ def process_add_all_to_all_fos():
             if sdg_label not in processed_fos.keys():
                 processed_fos[sdg_label] = set()
             processed_fos[sdg_label].update(map(lambda x: tuple(x), fos))
+
     return processed_fos
 
 
@@ -37,7 +38,7 @@ def process_replace_fos():
     path = 'raw_data/1_replace'
     add_replace_data_paths = sorted([
         f'{path}/{directory_name}'
-        for directory_name in os.listdir(path) 
+        for directory_name in os.listdir(path)
         if '.' not in directory_name
         ], key=lambda x: int(x.split('/')[1].split('_')[0]))
 
@@ -76,7 +77,7 @@ def process_remove_fos():
             if sdg_label not in remove_fos.keys():
                 remove_fos[sdg_label] = set()
             remove_fos[sdg_label].update(fos_ids)
-        
+
     return remove_fos
 
 
@@ -144,7 +145,7 @@ for sdg_label, terms in sdg_terms.items():
             use_pbar = i == (len(term_batches) - 2)
             futures.append(executor.submit(
                 _match_terms_to_fos,
-                sdg_label, batch, fos_to_match[:], sws, 
+                sdg_label, batch, fos_to_match[:], sws,
                 use_pbar=use_pbar, total=len(terms)
             ))
 
@@ -235,7 +236,7 @@ for sdg_label, rm_fos_ids in removed_fos.items():
         data_removed_fos['sdg_label'].append(sdg_label)
         data_removed_fos['fos_id'].append(fos_id)
         data_removed_fos['fos_name'].append(fos_name)
-    
+
 pd.DataFrame(data_removed_fos).sort_values(['sdg_label', 'fos_name']).to_excel(
     'raw_data/2_remove/RemovedFOS.xlsx', index=False
     )
@@ -260,11 +261,11 @@ with open("SdgFOS.json", "w") as file_:
     json.dump(sdg_fos, file_)
 
 
-""" 
-    Comparing to the last SdgFOS.json version 
+"""
+    Comparing to the last SdgFOS.json version
 """
 update_info = {
-    'sdg': [], 
+    'sdg': [],
     'new_fos_id': [], 'new_fos_name': [],
     'removed_fos_id': [], 'removed_fos_name': []
 }
@@ -297,7 +298,7 @@ for sdg_label in sorted(set(list(sdg_fos.keys()) + list(sdg_fos_old.keys())), ke
         update_info['new_fos_name'].append('')
         update_info['removed_fos_id'].append(fos_id)
         update_info['removed_fos_name'].append(fos_name)
-    
+
 pd.DataFrame(update_info).sort_values(['sdg', 'new_fos_name', 'removed_fos_name']).to_excel(
     'UPDATE_INFO.xlsx', index=False
     )

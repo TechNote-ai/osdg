@@ -140,7 +140,7 @@ for sdg_label, terms in sdg_terms_add_generated.items():
 
 sdg_terms_add_generated = {
     sdg_label: sorted(list(sdg_terms_add_generated[sdg_label]))
-    for sdg_label in sorted(sdg_terms_add_generated.keys(), key=sdg_label_sort) 
+    for sdg_label in sorted(sdg_terms_add_generated.keys(), key=sdg_label_sort)
     }
 
 with open(f'{INTER_ADD_PATH}/GeneratedSdgTerms.json', 'w') as file_:
