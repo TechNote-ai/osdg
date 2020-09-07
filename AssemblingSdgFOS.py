@@ -28,6 +28,7 @@ def process_add_all_to_all_fos():
             if sdg_label not in processed_fos.keys():
                 processed_fos[sdg_label] = set()
             processed_fos[sdg_label].update(map(lambda x: tuple(x), fos))
+    processed_fos = map(lambda fos: (str(fos[0]), fos[1]), processed_fos)
 
     return processed_fos
 
@@ -51,6 +52,7 @@ def process_replace_fos():
         with open(f'{directory}/{processed_replace_fos_fname}', 'r') as file_:
             processed_replace_fos = json.load(file_)
         replace_fos += list(processed_replace_fos.items())
+    replace_fos = map(lambda rp_fos: (str(rp_fos[0]), rp_fos[1]), replace_fos)
 
     return replace_fos
 
@@ -76,7 +78,7 @@ def process_remove_fos():
         for sdg_label, fos_ids in processed_remove_fos.items():
             if sdg_label not in remove_fos.keys():
                 remove_fos[sdg_label] = set()
-            remove_fos[sdg_label].update(fos_ids)
+            remove_fos[sdg_label].update(map(lambda fos_id: str(fos_id), fos_ids))
 
     return remove_fos
 
