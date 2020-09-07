@@ -27,8 +27,7 @@ def process_add_all_to_all_fos():
         for sdg_label, fos in processed_sdg_fos.items():
             if sdg_label not in processed_fos.keys():
                 processed_fos[sdg_label] = set()
-            processed_fos[sdg_label].update(map(lambda x: tuple(x), fos))
-    processed_fos = map(lambda fos: (str(fos[0]), fos[1]), processed_fos)
+            processed_fos[sdg_label].update(map(lambda x: (str(x[0]), x[1]), fos))
 
     return processed_fos
 
@@ -266,6 +265,7 @@ with open("SdgFOS.json", "w") as file_:
 """
     Comparing to the last SdgFOS.json version
 """
+print('\tSDG\t\tCOUNT_OLD\t\tCOUNT_NEW')
 update_info = {
     'sdg': [],
     'new_fos_id': [], 'new_fos_name': [],
@@ -284,7 +284,6 @@ for sdg_label in sorted(set(list(sdg_fos.keys()) + list(sdg_fos_old.keys())), ke
     fos_add = list(set(fos_new).difference(fos_old))
     fos_removed = list(set(fos_old).difference(fos_new))
 
-    print('\tSDG\tCOUNT_OLD\tCOUNT_NEW')
     print(f'\t{sdg_label}\t{len(fos_old)}\t{len(fos_new)}')
 
     for fos_id, fos_name in zip(fos_add, list(map(lambda fos_id: fos_map_700.get(fos_id, '__unknown__'), fos_add))):
