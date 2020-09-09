@@ -6,7 +6,7 @@
 | :------: | :------ | :------: | ------: |
 | 0. | SDG Ontology compiled by Dr Nuria B. Puig and E. Mauleon| 0_PuigOntology | [Dataset](https://figshare.com/articles/SDG_ontology/11106113/1) | 
 | 6. | Terms by Indicator from SDGIO Ontology | 6_SDGIO_Terms | [Link to SDGIO GitHub ](https://github.com/SDG-InterfaceOntology/sdgio) |
-
+##
 ## Generated data sources
 
 | Index | Description | Folder Name | Link |
@@ -18,7 +18,7 @@
 | 5. | Concepts UN Linked SDG tool extracted from Administrative Documents | 5_LinkedSDG_DocumentExtracts | [Link to LinkedSGS Tool](http://linkedsdg.apps.officialstatistics.org/#/) |
 | 7. | Concepts linked to SDGs from EC Policy Documents | 7_EC_Policy_Doc_Terms | Skrynnyk & Stanciauskas ( 2020 upcoming ) | 
 | 9. | Keywords from "Science4SDGs" project | 9_SIRIS_Science4SDGs | [Link to "Science4SDGs" project](http://science4sdgs.sirisacademic.com/) |
-
+##
 
 ## ATA data sources
 
