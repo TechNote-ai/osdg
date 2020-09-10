@@ -73,7 +73,7 @@ Assigned labels from raw data sources are assembled in two steps:
 # Raw Data structure
 * `raw_data/`
     * `0_add/`
-        * `00_add_validated/`
+        * `00_add_validated/`\
         **Expert validated term labels**\
         **&rarr;** each data source must produce:
             *`*_ProcessedKeyTerms.json`*
@@ -84,7 +84,7 @@ Assigned labels from raw data sources are assembled in two steps:
                 ...
             }
             ```
-        * `01_add_generated/`
+        * `01_add_generated/`\
         **Expert validated term labels**\
         **&rarr;** each data source must produce:
             *`*_ProcessedKeyTerms.json`*
@@ -95,7 +95,7 @@ Assigned labels from raw data sources are assembled in two steps:
                 ...
             }
             ```
-        * `02_add_all_to_all/`
+        * `02_add_all_to_all/`\
         **Expert validated FOS labels**\
         **&rarr;** each data source must produce:
             *`*_ProcessedFOS.json`*
@@ -106,7 +106,7 @@ Assigned labels from raw data sources are assembled in two steps:
                 ...
             }
             ```
-    * `1_replace/`
+    * `1_replace/`\
     **Mapping for FOS SDG label reassignment from `SDG_a` to `SDG_b`**\
     **&rarr;** each data source must produce:
         *`*_ReplaceFOS.json`*
@@ -117,7 +117,7 @@ Assigned labels from raw data sources are assembled in two steps:
             ...
         }
         ```
-    * `2_remove/`
+    * `2_remove/`\
     **FOS to remove from sdg assigned FOS lists**\
     **&rarr;** each data source must produce:
         *`*_RemoveFOS.json`*
@@ -128,7 +128,7 @@ Assigned labels from raw data sources are assembled in two steps:
             ...
         }
         ```
-    * `Blacklist`
+    * `Blacklist`\
     **Irrelevant FOS**\
     **&rarr;** each data source must produce:
         *`*_Blacklist.csv`*
