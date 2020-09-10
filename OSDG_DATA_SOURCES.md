@@ -55,7 +55,7 @@ Assigned labels from raw data sources are assembled in two steps:
     * 2.1. *Terms from `CombinedOntology.json` are matched to  MAG Fields of Study subset `FOSMAP.json` which contains over 150 thousand fields.*
     * 2.2. *Matched FOS are added to the final ontology `SdgFOS.json` .*
     * 2.3. *`02_add_all_to_all/` FOS are added to the final ontology `SdgFOS.json` .*
-    * 2.4*Final ontology `SdgFOS.json` is  adjusted based on `1_replace/` and `2_remove/` .*
+    * 2.4 *Final ontology `SdgFOS.json` is  adjusted based on `1_replace/` and `2_remove/` .*
 
 
     **&rarr;** **produces** `SdgFOS.json`
@@ -74,7 +74,7 @@ Assigned labels from raw data sources are assembled in two steps:
 * `raw_data/`
     * `0_add/`
         * `00_add_validated/`
-        **Expert validated term labels**
+        **Expert validated term labels**\
         **&rarr;** each data source must produce:
             *`*_ProcessedKeyTerms.json`*
             ```python
@@ -85,7 +85,7 @@ Assigned labels from raw data sources are assembled in two steps:
             }
             ```
         * `01_add_generated/`
-        **Expert validated term labels**
+        **Expert validated term labels**\
         **&rarr;** each data source must produce:
             *`*_ProcessedKeyTerms.json`*
             ```python
@@ -96,7 +96,7 @@ Assigned labels from raw data sources are assembled in two steps:
             }
             ```
         * `02_add_all_to_all/`
-        **Expert validated FOS labels**
+        **Expert validated FOS labels**\
         **&rarr;** each data source must produce:
             *`*_ProcessedFOS.json`*
             ```python
@@ -107,7 +107,7 @@ Assigned labels from raw data sources are assembled in two steps:
             }
             ```
     * `1_replace/`
-    **Mapping for FOS SDG label reassignment from `SDG_a` to `SDG_b`**
+    **Mapping for FOS SDG label reassignment from `SDG_a` to `SDG_b`**\
     **&rarr;** each data source must produce:
         *`*_ReplaceFOS.json`*
         ```python
@@ -118,7 +118,7 @@ Assigned labels from raw data sources are assembled in two steps:
         }
         ```
     * `2_remove/`
-    **FOS to remove from sdg assigned FOS lists**
+    **FOS to remove from sdg assigned FOS lists**\
     **&rarr;** each data source must produce:
         *`*_RemoveFOS.json`*
         ```python
@@ -129,7 +129,7 @@ Assigned labels from raw data sources are assembled in two steps:
         }
         ```
     * `Blacklist`
-    **Irrelevant FOS**
+    **Irrelevant FOS**\
     **&rarr;** each data source must produce:
         *`*_Blacklist.csv`*
         | fos_id | fos_name |
