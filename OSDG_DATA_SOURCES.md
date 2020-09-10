@@ -26,12 +26,118 @@
 | :------: | :------ | :------: | ------: |
 | 8. | FOS'es Linked to NABs Areas | 8_NABS_FOS | [Link to Eurostat](https://ec.europa.eu/eurostat/ramon/nomenclatures/index.cfm?TargetUrl=LST_NOM_DTL&StrNom=CEPA_1994&StrLanguageCode=EN&IntPcKey=4431590&StrLayoutCode=HIERARCHIC) |
 | 10. | A boost of SDG relevant FOS'es compiled by PPMI researchers | 10_PPMI_boost | [PPMI](https://ppmi.lt)|
-
 #
-# General Ontology Construction Procedure
 
-Raw data from each source is checked for obvious formatting errors. Then it is deduplicated, so a term can only appear be assigned to **ONE** SDG. 
-Then each data source is cleaned and adpated to the General Ontology with its own dedicated Script. Data from each source is merged into the General Ontology. 
-Items from the General Ontology are then matched to the MAG Fields of Study to produce SDG-FOS Ontology. 
+***
+# Ontology Construction Procedure
+
+Assigned labels from raw data sources are assembled in two steps:
+1. Assembling General Ontology `AssemblingCombinedOntology.py`
+**Assembles terms from `raw_data/0_add/` data sources.**
+    * *Term label conflicts from sources `00_add_validated/` and `02_add_all_to_all/` are ignored meaning if `term_1` is assigned to `SDG_1` by `source_1` and to `SDG_2` by `source_2` **&rarr;** `term_1` is assigned to both.*
+    * *Conflicts for term labels from `01_add_generated/` data sources are managed in two ways:* 
+        1. *If the conflict is between validated and generated term label **&rarr;** generated term label is discarded while validated one remains.*
+        2. *If the conflict is between generated & generated **&rarr;** both are discarded.*
+
+    **&rarr;** **produces** `CombinedOntology.json`
+    ```python
+    {
+        'SDG_1': {
+            'term_1': ['source_1', 'source_2', ...],
+            'term_2': ['source_1', 'source_3', ...]
+            ...
+        }
+        ...
+    }
+    ```
+2. Assembling Sdg FOS `AssemblingSdgFOS.py`
+    **Assembles FOS from `CombinedOntology.json` and `02_add_all_to_all/` sources.**
+        2.1. *Terms from `CombinedOntology.json` are matched to  MAG Fields of Study subset `FOSMAP.json` which contains over 150 thousand fields.*
+        2.2. *Matched FOS are added to the final ontology `SdgFOS.json` .*
+        2.3. *`02_add_all_to_all/` FOS are added to the final ontology `SdgFOS.json` .*
+        2.4. *Final ontology `SdgFOS.json` is  adjusted based on `1_replace/` and `2_remove/` .*
+
+
+    **&rarr;** **produces** `SdgFOS.json`
+    ```python
+    {
+        'SDG_1': ['fos_id_1', 'fos_id_2', ...],
+        'SDG_2': ['fos_id_3', 'fos_id_4', ...]
+        ...
+    }
+    ```
+
+ 
+
+****
+# Raw Data structure
+* `raw_data/`
+    * `0_add/`
+        * `00_add_validated/`
+        **Expert validated term labels**
+        **&rarr;** each data source must produce:
+            *`*_ProcessedKeyTerms.json`*
+            ```python
+            {
+                'SDG_1': ['term_1', 'term_2', ...], 
+                'SDG_2': ['term_3', 'term_4', ...],
+                ...
+            }
+            ```
+        * `01_add_generated/`
+        **Expert validated term labels**
+        **&rarr;** each data source must produce:
+            *`*_ProcessedKeyTerms.json`*
+            ```python
+            {
+                'SDG_1': ['term_1', 'term_2', ...], 
+                'SDG_2': ['term_3', 'term_4', ...],
+                ...
+            }
+            ```
+        * `02_add_all_to_all/`
+        **Expert validated FOS labels**
+        **&rarr;** each data source must produce:
+            *`*_ProcessedFOS.json`*
+            ```python
+            {
+                'SDG_1': [['fos_id_1', 'fos_name_1'], ['fos_id_2', 'fos_name_2'], ...], 
+                'SDG_2': [['fos_id_3', 'fos_name_3'], ['fos_id_4', 'fos_name_4'], ...],
+                ...
+            }
+            ```
+    * `1_replace/`
+    **Mapping for FOS SDG label reassignment from `SDG_a` to `SDG_b`**
+    **&rarr;** each data source must produce:
+        *`*_ReplaceFOS.json`*
+        ```python
+        {
+            'fos_id_1': ['SDG_1', 'SDG_2'], 
+            'fos_id_2': ['SDG_3', 'SDG_4'],
+            ...
+        }
+        ```
+    * `2_remove/`
+    **FOS to remove from sdg assigned FOS lists**
+    **&rarr;** each data source must produce:
+        *`*_RemoveFOS.json`*
+        ```python
+        {
+            'SDG_1': ['fos_id_1', 'fos_id_2', ...], 
+            'SDG_2': ['fos_id_1', 'fos_id_3', ...],
+            ...
+        }
+        ```
+    * `Blacklist`
+    **Irrelevant FOS**
+    **&rarr;** each data source must produce:
+        *`*_Blacklist.csv`*
+        | fos_id | fos_name |
+        | :------  | :-------- |
+        | fos_id_1 | fos_name_1 |
+        | fos_id_2 | fos_name_2 |
+        | ... | ...|
+
+
 
 
