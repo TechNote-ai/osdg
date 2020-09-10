@@ -50,7 +50,7 @@ Assigned labels from raw data sources are assembled in two steps:
         ...
     }
     ```
-2. Assembling Sdg FOS `AssemblingSdgFOS.py`\
+2. Assembling Sdg FOS Ontology `AssemblingSdgFOS.py`\
     **Assembles FOS from `CombinedOntology.json` and `02_add_all_to_all/` sources.**
     * 2.1. *Terms from `CombinedOntology.json` are matched to  MAG Fields of Study subset `FOSMAP.json` which contains over 150 thousand fields.*
     * 2.2. *Matched FOS are added to the final ontology `SdgFOS.json` .*
