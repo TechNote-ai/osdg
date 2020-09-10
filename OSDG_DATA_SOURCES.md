@@ -36,8 +36,8 @@ Assigned labels from raw data sources are assembled in two steps:
 **Assembles terms from `raw_data/0_add/` data sources.**
     * *Term label conflicts from sources `00_add_validated/` and `02_add_all_to_all/` are ignored meaning if `term_1` is assigned to `SDG_1` by `source_1` and to `SDG_2` by `source_2` **&rarr;** `term_1` is assigned to both.*
     * *Conflicts for term labels from `01_add_generated/` data sources are managed in two ways:* 
-        1. *If the conflict is between validated and generated term label **&rarr;** generated term label is discarded while validated one remains.*
-        2. *If the conflict is between generated & generated **&rarr;** both are discarded.*
+        - *If the conflict is between validated and generated term label **&rarr;** generated term label is discarded while validated one remains.*
+        - *If the conflict is between generated & generated **&rarr;** both are discarded.*
 
     **&rarr;** **produces** `CombinedOntology.json`
     ```python
@@ -52,10 +52,10 @@ Assigned labels from raw data sources are assembled in two steps:
     ```
 2. Assembling Sdg FOS `AssemblingSdgFOS.py`
     **Assembles FOS from `CombinedOntology.json` and `02_add_all_to_all/` sources.**
-        1. *Terms from `CombinedOntology.json` are matched to  MAG Fields of Study subset `FOSMAP.json` which contains over 150 thousand fields.*
-        2. *Matched FOS are added to the final ontology `SdgFOS.json` .*
-        3. *`02_add_all_to_all/` FOS are added to the final ontology `SdgFOS.json` .*
-        4. *Final ontology `SdgFOS.json` is  adjusted based on `1_replace/` and `2_remove/` .*
+    1. *Terms from `CombinedOntology.json` are matched to  MAG Fields of Study subset `FOSMAP.json` which contains over 150 thousand fields.*
+    2. *Matched FOS are added to the final ontology `SdgFOS.json` .*
+    3. *`02_add_all_to_all/` FOS are added to the final ontology `SdgFOS.json` .*
+    4. *Final ontology `SdgFOS.json` is  adjusted based on `1_replace/` and `2_remove/` .*
 
 
     **&rarr;** **produces** `SdgFOS.json`
