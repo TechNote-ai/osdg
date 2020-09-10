@@ -32,7 +32,7 @@
 # Ontology Construction Procedure
 
 Assigned labels from raw data sources are assembled in two steps:
-1. Assembling General Ontology `AssemblingCombinedOntology.py`
+_1. Assembling General Ontology `AssemblingCombinedOntology.py`
 **Assembles terms from `raw_data/0_add/` data sources.**
     * *Term label conflicts from sources `00_add_validated/` and `02_add_all_to_all/` are ignored meaning if `term_1` is assigned to `SDG_1` by `source_1` and to `SDG_2` by `source_2` **&rarr;** `term_1` is assigned to both.*
     * *Conflicts for term labels from `01_add_generated/` data sources are managed in two ways:* 
@@ -50,12 +50,12 @@ Assigned labels from raw data sources are assembled in two steps:
         ...
     }
     ```
-2. Assembling Sdg FOS `AssemblingSdgFOS.py`
+_2. Assembling Sdg FOS `AssemblingSdgFOS.py`
     **Assembles FOS from `CombinedOntology.json` and `02_add_all_to_all/` sources.**
-__________2.1. *Terms from `CombinedOntology.json` are matched to  MAG Fields of Study subset `FOSMAP.json` which contains over 150 thousand fields.*
-__________2.2. *Matched FOS are added to the final ontology `SdgFOS.json` .*
-__________2.3. *`02_add_all_to_all/` FOS are added to the final ontology `SdgFOS.json` .*
-__________2.4. *Final ontology `SdgFOS.json` is  adjusted based on `1_replace/` and `2_remove/` .*
+__2.1. *Terms from `CombinedOntology.json` are matched to  MAG Fields of Study subset `FOSMAP.json` which contains over 150 thousand fields.*
+__2.2. *Matched FOS are added to the final ontology `SdgFOS.json` .*
+__2.3. *`02_add_all_to_all/` FOS are added to the final ontology `SdgFOS.json` .*
+__2.4. *Final ontology `SdgFOS.json` is  adjusted based on `1_replace/` and `2_remove/` .*
 
 
     **&rarr;** **produces** `SdgFOS.json`
