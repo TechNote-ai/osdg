@@ -149,6 +149,7 @@ with open(f'{INTER_ADD_PATH}/GeneratedSdgTerms.json', 'w') as file_:
 # Combined Validated and Generated Sdg Terms
 sdg_ontology_combined = OrderedDict()
 
+ata_sources = [path.split('/')[-1] for path in add_all_to_all_data_paths]
 sdg_labels = sorted(set(list(sdg_terms_add_validated.keys()) + list(sdg_terms_add_generated.keys())), key=sdg_label_sort)
 for sdg_label in sdg_labels:
     sdg_ontology_combined[sdg_label] = OrderedDict()
@@ -156,9 +157,12 @@ for sdg_label in sdg_labels:
     generated_terms = sdg_terms_add_generated[sdg_label] if sdg_label in sdg_terms_add_generated.keys() else []
 
     for term in sorted(list(set(validated_terms + generated_terms))):
+        t_sources = sorted(term_sources[sdg_label][term], key=sdg_label_sort)
+        if all(src in ata_sources for src in t_sources):
+            continue
         if term not in sdg_ontology_combined[sdg_label].keys():
             sdg_ontology_combined[sdg_label][term] = dict()
-        sdg_ontology_combined[sdg_label][term] = sorted(term_sources[sdg_label][term], key=sdg_label_sort)
+        sdg_ontology_combined[sdg_label][term] = t_sources
 
 with open("CombinedOntology.json", "w") as file_:
     file_.write(json.dumps(sdg_ontology_combined))

@@ -2,40 +2,6 @@ import pandas as pd
 import json
 
 
-replacables_symbols = ["&", "-", '"', "  "]
-replacables_words = ["and", "or", "for", "&", "of", "sdg", "oecd", "arctic"]
-
-
-def pre_proc(list_o_tuples):
-    """
-    Keeps only the keywords longer than 4 characters ;
-    Strips non Alphanumeric chars ;
-    Removes basic interluding words ( "and" , "of" , etc. ) ;
-    Deduplicates
-    """
-
-    processed = []
-    alpha = "abcdefghijklmnopqrstuvwxyz0123456789 "
-    for id_, item in list_o_tuples:
-        item = item.replace("_", " ")
-        item = item.lower()
-
-        for c in replacables_symbols:
-            item = item.replace(c, " ")
-        item_p = item.split()
-        item = " ".join(i for i in item_p if i not in replacables_words)
-
-        if all(c in alpha for c in item):
-            if item.startswith(" "):
-                item = item[1:]
-            if item.endswith(" "):
-                item = item[:-1]
-            if len(item) > 4:
-                if item not in processed:
-                    processed.append((id_, item))
-    return processed
-
-
 dfl = pd.read_excel("SDG FOS updated 06 01.xlsx").to_dict(orient="records")
 
 sdg_words = {}
@@ -56,8 +22,8 @@ for key, value in sdg_words.items():
 
 print("Overall : ", counter)
 
-for key, value in sdg_words.items():
-    sdg_words[key] = pre_proc(set(value))
+for sdg_label in sorted(sdg_words.keys(), key=lambda x: int(x.split('_')[-1])):
+    sdg_words[sdg_label] = sorted(sdg_words[sdg_label], key=lambda x: x[1])
 
 with open("10_ProcessedFOS.json", "w") as file_:
     file_.write(json.dumps(sdg_words))
