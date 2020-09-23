@@ -2,7 +2,7 @@ import pandas as pd
 import json
 
 
-dfl = pd.read_excel("SDG FOS updated 06 01.xlsx").to_dict(orient="records")
+dfl = pd.read_excel("SDG FOS updated 06 12.xlsx").to_dict(orient="records")
 
 sdg_words = {}
 
