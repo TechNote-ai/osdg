@@ -32,14 +32,14 @@
 # Ontology Construction Procedure
 
 Assigned labels from raw data sources are assembled in two steps:
-1. Assembling General Ontology `AssemblingCombinedOntology.py`\
+1. Assembling terms `AssemblingTerms.py`\
 **Assembles terms from `raw_data/0_add/` data sources.**
-    * *Term label conflicts from sources `00_add_validated/` and `02_add_all_to_all/` are ignored meaning if `term_1` is assigned to `SDG_1` by `source_1` and to `SDG_2` by `source_2` **&rarr;** `term_1` is assigned to both.*
+    * *Term label conflicts from sources `00_add_validated/` are ignored meaning if `term_1` is assigned to `SDG_1` by `source_1` and to `SDG_2` by `source_2` **&rarr;** `term_1` is assigned to both.*
     * *Conflicts for term labels from `01_add_generated/` data sources are managed in two ways:* 
         - *If the conflict is between validated and generated term label **&rarr;** generated term label is discarded while validated one remains.*
         - *If the conflict is between generated & generated **&rarr;** both are discarded.*
 
-    **&rarr;** **produces** `CombinedOntology.json`
+    **&rarr;** **produces** `InterimTerms.json`
     ```python
     {
         'SDG_1': {
@@ -50,15 +50,15 @@ Assigned labels from raw data sources are assembled in two steps:
         ...
     }
     ```
-2. Assembling Sdg FOS Ontology `AssemblingSdgFOS.py`\
-    **Assembles FOS from `CombinedOntology.json` and `02_add_all_to_all/` sources.**
-    * 2.1. *Terms from `CombinedOntology.json` are matched to  MAG Fields of Study subset `FOSMAP.json` which contains over 150 thousand fields.*
-    * 2.2. *Matched FOS are added to the final ontology `SdgFOS.json` .*
-    * 2.3. *`02_add_all_to_all/` FOS are added to the final ontology `SdgFOS.json` .*
-    * 2.4 *Final ontology `SdgFOS.json` is  adjusted based on `1_replace/` and `2_remove/` .*
+2. Assembling FOS Ontology `AssemblingFOSOntology.py`\
+    **Assembles FOS from `InterimTerms.json` and `02_add_all_to_all/` data sources.**
+    * 2.1. *Terms from `InterimTerms.json` are matched to  MAG Fields of Study subset `FOSMAP.json` which contains over 150 thousand fields.*
+    * 2.2. *Matched FOS are added to the final ontology `FOS-Ontology.json` .*
+    * 2.3. *`02_add_all_to_all/` FOS are added to the final ontology `FOS-Ontology.json` .*
+    * 2.4 *Final ontology `FOS-Ontology.json` is adjusted based on `1_replace/` and `2_remove/` .*
 
 
-    **&rarr;** **produces** `SdgFOS.json`
+    **&rarr;** **produces** `FOS-Ontology.json`
     ```python
     {
         'SDG_1': ['fos_id_1', 'fos_id_2', ...],

@@ -164,5 +164,5 @@ for sdg_label in sdg_labels:
             sdg_ontology_combined[sdg_label][term] = dict()
         sdg_ontology_combined[sdg_label][term] = t_sources
 
-with open("CombinedOntology.json", "w") as file_:
+with open("InterimTerms.json", "w") as file_:
     file_.write(json.dumps(sdg_ontology_combined))

@@ -82,7 +82,7 @@ def process_remove_fos():
     return remove_fos
 
 
-with open("CombinedOntology.json", "r") as file_:
+with open("InterimTerms.json", "r") as file_:
     sdg_terms = json.loads(file_.read())
 
 with open('FOSMAP_700.json', 'r') as file_:
@@ -162,7 +162,7 @@ sdg_matched_fos = {
         fos: sdg_matched_fos[sdg_label][fos] for fos in sorted(sdg_matched_fos[sdg_label].keys())
     } for sdg_label in sdg_labels
 }
-with open("SdgMatchedFOS.json", "w") as file_:
+with open("MatchedFOS.json", "w") as file_:
     json.dump(sdg_matched_fos, file_)
 
 
@@ -253,54 +253,54 @@ print("\n\t--- Final FOS Count ---")
 for sdg_label, foses in sdg_fos.items():
     print(f'\t{sdg_label} - {len(foses)}')
 
-with open('SdgFOS.json', 'r') as file_:
+with open('FOS-Ontology.json', 'r') as file_:
     sdg_fos_old = json.load(file_)
 
-with open('SdgFOS_ver-min-1.json', 'w') as file_:
+with open('FOS-Ontology_ver-min-1.json', 'w') as file_:
     json.dump(sdg_fos_old, file_)
 
-with open("SdgFOS.json", "w") as file_:
+with open("FOS-Ontology.json", "w") as file_:
     json.dump(sdg_fos, file_)
 
 
-"""
-    Comparing to the last SdgFOS.json version
-"""
-print('\tSDG\t\tCOUNT_OLD\t\tCOUNT_NEW')
-update_info = {
-    'sdg': [],
-    'new_fos_id': [], 'new_fos_name': [],
-    'removed_fos_id': [], 'removed_fos_name': []
-}
-for sdg_label in sorted(set(list(sdg_fos.keys()) + list(sdg_fos_old.keys())), key=sdg_label_sort):
-    try:
-        fos_old = sdg_fos_old[sdg_label]
-    except KeyError:
-        fos_old = []
-    try:
-        fos_new = sdg_fos[sdg_label]
-    except KeyError:
-        fos_new = []
+# """
+#     Comparing to the last SdgFOS.json version
+# """
+# print('\tSDG\t\tCOUNT_OLD\t\tCOUNT_NEW')
+# update_info = {
+#     'sdg': [],
+#     'new_fos_id': [], 'new_fos_name': [],
+#     'removed_fos_id': [], 'removed_fos_name': []
+# }
+# for sdg_label in sorted(set(list(sdg_fos.keys()) + list(sdg_fos_old.keys())), key=sdg_label_sort):
+#     try:
+#         fos_old = sdg_fos_old[sdg_label]
+#     except KeyError:
+#         fos_old = []
+#     try:
+#         fos_new = sdg_fos[sdg_label]
+#     except KeyError:
+#         fos_new = []
 
-    fos_add = list(set(fos_new).difference(fos_old))
-    fos_removed = list(set(fos_old).difference(fos_new))
+#     fos_add = list(set(fos_new).difference(fos_old))
+#     fos_removed = list(set(fos_old).difference(fos_new))
 
-    print(f'\t{sdg_label}\t{len(fos_old)}\t{len(fos_new)}')
+#     print(f'\t{sdg_label}\t{len(fos_old)}\t{len(fos_new)}')
 
-    for fos_id, fos_name in zip(fos_add, list(map(lambda fos_id: fos_map_700.get(fos_id, '__unknown__'), fos_add))):
-        update_info['sdg'].append(sdg_label)
-        update_info['new_fos_id'].append(fos_id)
-        update_info['new_fos_name'].append(fos_name)
-        update_info['removed_fos_id'].append('')
-        update_info['removed_fos_name'].append('')
+#     for fos_id, fos_name in zip(fos_add, list(map(lambda fos_id: fos_map_700.get(fos_id, '__unknown__'), fos_add))):
+#         update_info['sdg'].append(sdg_label)
+#         update_info['new_fos_id'].append(fos_id)
+#         update_info['new_fos_name'].append(fos_name)
+#         update_info['removed_fos_id'].append('')
+#         update_info['removed_fos_name'].append('')
 
-    for fos_id, fos_name in zip(fos_removed, list(map(lambda fos_id: fos_map_700.get(fos_id, '__unknown__'), fos_removed))):
-        update_info['sdg'].append(sdg_label)
-        update_info['new_fos_id'].append('')
-        update_info['new_fos_name'].append('')
-        update_info['removed_fos_id'].append(fos_id)
-        update_info['removed_fos_name'].append(fos_name)
+#     for fos_id, fos_name in zip(fos_removed, list(map(lambda fos_id: fos_map_700.get(fos_id, '__unknown__'), fos_removed))):
+#         update_info['sdg'].append(sdg_label)
+#         update_info['new_fos_id'].append('')
+#         update_info['new_fos_name'].append('')
+#         update_info['removed_fos_id'].append(fos_id)
+#         update_info['removed_fos_name'].append(fos_name)
 
-pd.DataFrame(update_info).sort_values(['sdg', 'new_fos_name', 'removed_fos_name']).to_excel(
-    'UPDATE_INFO.xlsx', index=False
-    )
+# pd.DataFrame(update_info).sort_values(['sdg', 'new_fos_name', 'removed_fos_name']).to_excel(
+#     'UPDATE_INFO.xlsx', index=False
+#     )
