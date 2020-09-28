@@ -253,13 +253,13 @@ print("\n\t--- Final FOS Count ---")
 for sdg_label, foses in sdg_fos.items():
     print(f'\t{sdg_label} - {len(foses)}')
 
-with open('FOS-Ontology.json', 'r') as file_:
+with open('OSDG-Ontology.json', 'r') as file_:
     sdg_fos_old = json.load(file_)
 
-with open('FOS-Ontology_ver-min-1.json', 'w') as file_:
+with open('OSDG-Ontology_ver-min-1.json', 'w') as file_:
     json.dump(sdg_fos_old, file_)
 
-with open("FOS-Ontology.json", "w") as file_:
+with open("OSDG-Ontology.json", "w") as file_:
     json.dump(sdg_fos, file_)
 
 

@@ -50,7 +50,7 @@ Assigned labels from raw data sources are assembled in two steps:
         ...
     }
     ```
-2. Assembling FOS Ontology `AssemblingFOSOntology.py`\
+2. Assembling OSDG Ontology `AssemblingOntology.py`\
     **Assembles FOS from `InterimTerms.json` and `02_add_all_to_all/` data sources.**
     * 2.1. *Terms from `InterimTerms.json` are matched to  MAG Fields of Study subset `FOSMAP.json` which contains over 150 thousand fields.*
     * 2.2. *Matched FOS are added to the final ontology `FOS-Ontology.json` .*
@@ -58,7 +58,7 @@ Assigned labels from raw data sources are assembled in two steps:
     * 2.4 *Final ontology `FOS-Ontology.json` is adjusted based on `1_replace/` and `2_remove/` .*
 
 
-    **&rarr;** **produces** `FOS-Ontology.json`
+    **&rarr;** **produces** `OSDG-Ontology.json`
     ```python
     {
         'SDG_1': ['fos_id_1', 'fos_id_2', ...],
