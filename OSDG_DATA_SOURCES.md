@@ -112,8 +112,8 @@ Assigned labels from raw data sources are assembled in two steps:
         *`*_ReplaceFOS.json`*
         ```python
         {
-            'fos_id_1': ['SDG_1', 'SDG_2'], 
-            'fos_id_2': ['SDG_3', 'SDG_4'],
+            'fos_id_1': [['SDG_1', 'SDG_2'], ...], 
+            'fos_id_2': [['SDG_3', 'SDG_4'], ...],
             ...
         }
         ```

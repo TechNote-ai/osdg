@@ -50,8 +50,9 @@ def process_replace_fos():
             continue
         with open(f'{directory}/{processed_replace_fos_fname}', 'r') as file_:
             processed_replace_fos = json.load(file_)
-        replace_fos += list(processed_replace_fos.items())
-    replace_fos = map(lambda rp_fos: (str(rp_fos[0]), rp_fos[1]), replace_fos)
+        for fos_id, moves in processed_replace_fos.items():
+            for move in moves:
+                replace_fos.append((str(fos_id), move))
 
     return replace_fos
 
