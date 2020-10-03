@@ -262,15 +262,15 @@ with open("OSDG-Ontology.json", "w") as file_:
     json.dump(sdg_fos, file_)
 
 # Representative OSDG-Ontology
-data_ontology = {'FOS-ID': [], 'FOS-Name': [], 'SDG label': [], 'Link to MAG': []}
+data_ontology = {'SDG label': [], 'FOS-ID': [], 'FOS-Name': [], 'Link to MAG': []}
 for sdg_label, fos_ids in sdg_fos.items():
     sdg_nr = int(sdg_label.split('_')[1])
     for fos_id in fos_ids:
         fos_name = fos_map_700.get(fos_id, None)
         mag_link = f'https://academic.microsoft.com/topic/{fos_id}'
+        data_ontology['SDG label'].append(sdg_nr)
         data_ontology['FOS-ID'].append(fos_id)
         data_ontology['FOS-Name'].append(fos_name)
-        data_ontology['SDG label'].append(sdg_nr)
         data_ontology['Link to MAG'].append(mag_link)
 
 df_ontology = pd.DataFrame(data_ontology).sort_values('SDG label')
@@ -358,5 +358,6 @@ for sdg_label in sorted(set(list(sdg_fos.keys()) + list(sdg_fos_old.keys())), ke
         data['isinReplaced'].append(isin_replaced)
         data['isinRemoved'].append(isin_removed)
 
-pd.DataFrame(data).to_excel('comparison_fos_update.xlsx', index=False)
+df_comparison = pd.DataFrame(data).sort_values(['add_or_remove', 'isinReplaced', 'isinRemoved', 'sdg'])
+df_comparison.to_excel('comparison_fos_update.xlsx', index=False)
 
