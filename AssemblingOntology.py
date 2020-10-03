@@ -197,23 +197,22 @@ for sdg_label, foses in processed_all_to_all_fos.items():
 """
 data_replaced_fos = {'fos_id': [], 'fos_name': [], 'from_sdg': [], 'to_sdg': []}
 processed_replace_fos = process_replace_fos()
-for fos_id, moves in processed_replace_fos:
+for fos_id, move in processed_replace_fos:
     fos_name = fos_map_700.get(fos_id, '')
-    for from_sdg, to_sdg in moves:
-        try:
-            sdg_fos[from_sdg].remove(fos_id)
-        except KeyError:
-            from_sdg = ''
-        sdg_fos[to_sdg].add(fos_id)
+    from_sdg, to_sdg = move
+    try:
+        sdg_fos[from_sdg].remove(fos_id)
+    except KeyError:
+        from_sdg = ''
+    sdg_fos[to_sdg].add(fos_id)
 
-        data_replaced_fos['fos_id'].append(fos_id)
-        data_replaced_fos['fos_name'].append(fos_name)
-        data_replaced_fos['from_sdg'].append(from_sdg)
-        data_replaced_fos['to_sdg'].append(to_sdg)
+    data_replaced_fos['fos_id'].append(fos_id)
+    data_replaced_fos['fos_name'].append(fos_name)
+    data_replaced_fos['from_sdg'].append(from_sdg)
+    data_replaced_fos['to_sdg'].append(to_sdg)
 
-pd.DataFrame(data_replaced_fos).sort_values(['from_sdg', 'to_sdg', 'fos_name']).to_excel(
-    'raw_data/1_replace/ReplacedFOS.xlsx', index=False
-    )
+df_replaced = pd.DataFrame(data_replaced_fos).sort_values(['from_sdg', 'to_sdg', 'fos_name'])
+df_replaced.to_excel('raw_data/1_replace/ReplacedFOS.xlsx', index=False)
 
 """
     Removing 2_remove/ FOS
@@ -240,9 +239,8 @@ for sdg_label, rm_fos_ids in removed_fos.items():
         data_removed_fos['fos_id'].append(fos_id)
         data_removed_fos['fos_name'].append(fos_name)
 
-pd.DataFrame(data_removed_fos).sort_values(['sdg_label', 'fos_name']).to_excel(
-    'raw_data/2_remove/RemovedFOS.xlsx', index=False
-    )
+df_removed = pd.DataFrame(data_removed_fos).sort_values(['sdg_label', 'fos_name'])
+df_removed.to_excel('raw_data/2_remove/RemovedFOS.xlsx', index=False)
 
 """
     Writing to file
@@ -263,45 +261,102 @@ with open('OSDG-Ontology_ver-min-1.json', 'w') as file_:
 with open("OSDG-Ontology.json", "w") as file_:
     json.dump(sdg_fos, file_)
 
+# Representative OSDG-Ontology
+data_ontology = {'FOS-ID': [], 'FOS-Name': [], 'SDG label': [], 'Link to MAG': []}
+for sdg_label, fos_ids in sdg_fos.items():
+    sdg_nr = int(sdg_label.split('_')[1])
+    for fos_id in fos_ids:
+        fos_name = fos_map_700.get(fos_id, None)
+        mag_link = f'https://academic.microsoft.com/topic/{fos_id}'
+        data_ontology['FOS-ID'].append(fos_id)
+        data_ontology['FOS-Name'].append(fos_name)
+        data_ontology['SDG label'].append(sdg_nr)
+        data_ontology['Link to MAG'].append(mag_link)
 
-# """
-#     Comparing to the last SdgFOS.json version
-# """
-# print('\tSDG\t\tCOUNT_OLD\t\tCOUNT_NEW')
-# update_info = {
-#     'sdg': [],
-#     'new_fos_id': [], 'new_fos_name': [],
-#     'removed_fos_id': [], 'removed_fos_name': []
-# }
-# for sdg_label in sorted(set(list(sdg_fos.keys()) + list(sdg_fos_old.keys())), key=sdg_label_sort):
-#     try:
-#         fos_old = sdg_fos_old[sdg_label]
-#     except KeyError:
-#         fos_old = []
-#     try:
-#         fos_new = sdg_fos[sdg_label]
-#     except KeyError:
-#         fos_new = []
+df_ontology = pd.DataFrame(data_ontology).sort_values('SDG label')
+df_ontology['SDG label'] = df_ontology['SDG label'].apply(lambda sdg_nr: f'SDG_{sdg_nr}')
 
-#     fos_add = list(set(fos_new).difference(fos_old))
-#     fos_removed = list(set(fos_old).difference(fos_new))
+df_ontology.to_excel('OSDG-Ontology.xlsx', index=False)
 
-#     print(f'\t{sdg_label}\t{len(fos_old)}\t{len(fos_new)}')
 
-#     for fos_id, fos_name in zip(fos_add, list(map(lambda fos_id: fos_map_700.get(fos_id, '__unknown__'), fos_add))):
-#         update_info['sdg'].append(sdg_label)
-#         update_info['new_fos_id'].append(fos_id)
-#         update_info['new_fos_name'].append(fos_name)
-#         update_info['removed_fos_id'].append('')
-#         update_info['removed_fos_name'].append('')
+"""
+    Comparing to the last SdgFOS.json version
+"""
+with open('raw_data/0_add/02_add_all_to_all/8_NABS_FOS/8_ProcessedFOS.json', 'r') as file_:
+    nabs = json.load(file_)
 
-#     for fos_id, fos_name in zip(fos_removed, list(map(lambda fos_id: fos_map_700.get(fos_id, '__unknown__'), fos_removed))):
-#         update_info['sdg'].append(sdg_label)
-#         update_info['new_fos_id'].append('')
-#         update_info['new_fos_name'].append('')
-#         update_info['removed_fos_id'].append(fos_id)
-#         update_info['removed_fos_name'].append(fos_name)
+with open('raw_data/0_add/02_add_all_to_all/10_PPMI_boost/10_ProcessedFOS.json', 'r') as file_:
+    boost = json.load(file_)
 
-# pd.DataFrame(update_info).sort_values(['sdg', 'new_fos_name', 'removed_fos_name']).to_excel(
-#     'UPDATE_INFO.xlsx', index=False
-#     )
+data = {
+    'sdg': [],
+    'add_or_remove': [],
+    'fos_id': [], 'fos_name': [],
+    'sources': [], 'isinReplaced': [], 'isinRemoved':[]
+}
+for sdg_label in sorted(set(list(sdg_fos.keys()) + list(sdg_fos_old.keys())), key=sdg_label_sort):
+    old_foses = sdg_fos_old.get(sdg_label, [])
+    new_foses = sdg_fos.get(sdg_label, [])
+
+    added_foses = list(set(new_foses).difference(old_foses))
+    removed_foses = list(set(old_foses).difference(new_foses))
+
+    # Added
+    for fos_id in added_foses:
+        fos_name = fos_map_700[fos_id]
+    
+        sources = set()
+        for mterm, mterm_data in sdg_matched_fos[sdg_label].items():
+            if fos_id in mterm_data['matched_FOS_ids']:
+                sources.update(mterm_data['sources'])
+
+        # 8 Nabs & 10 boost aka ATA
+        nabs_fos_ids = list(map(lambda fos: fos[0], nabs.get(sdg_label, [])))
+        boost_fos_ids = list(map(lambda fos: fos[0], boost.get(sdg_label, [])))
+        if fos_id in nabs_fos_ids:
+            sources.add('8_NABS_FOS')
+        if fos_id in boost_fos_ids:
+            sources.add('10_PPMI_fos')
+            
+        # Replaced
+        isin_replaced = fos_id in df_replaced[df_replaced.to_sdg == sdg_label].fos_id.astype(str).tolist()
+        
+        data['sdg'].append(sdg_label)
+        data['add_or_remove'].append('add')
+        data['fos_id'].append(fos_id)
+        data['fos_name'].append(fos_name)
+        data['sources'].append(list(sources) if list(sources) else None)
+        data['isinReplaced'].append(isin_replaced)
+        data['isinRemoved'].append(False)
+
+    # Removed
+    for fos_id in removed_foses:
+        fos_name = fos_map_700[fos_id]
+    
+        sources = set()
+        for mterm, mterm_data in sdg_matched_fos[sdg_label].items():
+            if fos_id in mterm_data['matched_FOS_ids']:
+                sources.update(mterm_data['sources'])
+
+        # 8 Nabs & 10 boost aka ATA
+        nabs_fos_ids = list(map(lambda fos: fos[0], nabs.get(sdg_label, [])))
+        boost_fos_ids = list(map(lambda fos: fos[0], boost.get(sdg_label, [])))
+        if fos_id in nabs_fos_ids:
+            sources.add('8_NABS_FOS')
+        if fos_id in boost_fos_ids:
+            sources.add('10_PPMI_fos')
+            
+        # Replaced
+        isin_replaced = fos_id in df_replaced[df_replaced.from_sdg == sdg_label].fos_id.astype(str).tolist()
+        isin_removed = fos_id in df_removed[df_removed.sdg_label == sdg_label].fos_id.astype(str).tolist()
+        
+        data['sdg'].append(sdg_label)
+        data['add_or_remove'].append('add')
+        data['fos_id'].append(fos_id)
+        data['fos_name'].append(fos_name)
+        data['sources'].append(list(sources) if list(sources) else None)
+        data['isinReplaced'].append(isin_replaced)
+        data['isinRemoved'].append(isin_removed)
+
+pd.DataFrame(data).to_excel('comparison_fos_update.xlsx', index=False)
+
