@@ -273,7 +273,7 @@ for sdg_label, fos_ids in sdg_fos.items():
         data_ontology['FOS-Name'].append(fos_name)
         data_ontology['Link to MAG'].append(mag_link)
 
-df_ontology = pd.DataFrame(data_ontology).sort_values('SDG label')
+df_ontology = pd.DataFrame(data_ontology).sort_values(['SDG label', 'FOS-Name', 'FOS-ID'])
 df_ontology['SDG label'] = df_ontology['SDG label'].apply(lambda sdg_nr: f'SDG_{sdg_nr}')
 
 df_ontology.to_excel('OSDG-Ontology.xlsx', index=False)
