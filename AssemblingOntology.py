@@ -351,7 +351,7 @@ for sdg_label in sorted(set(list(sdg_fos.keys()) + list(sdg_fos_old.keys())), ke
         isin_removed = fos_id in df_removed[df_removed.sdg_label == sdg_label].fos_id.astype(str).tolist()
         
         data['sdg'].append(sdg_label)
-        data['add_or_remove'].append('add')
+        data['add_or_remove'].append('removed')
         data['fos_id'].append(fos_id)
         data['fos_name'].append(fos_name)
         data['sources'].append(list(sources) if list(sources) else None)
