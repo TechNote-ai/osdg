@@ -40,7 +40,8 @@ def process_replace_fos():
         f'{path}/{directory_name}'
         for directory_name in os.listdir(path)
         if '.' not in directory_name
-        ], key=lambda x: int(x.split('/')[1].split('_')[0]))
+    ],
+        key=lambda x: int(x.split('/')[-1].split('_')[0]))
 
     for directory in add_replace_data_paths:
         try:
@@ -53,7 +54,7 @@ def process_replace_fos():
         for fos_id, moves in processed_replace_fos.items():
             for move in moves:
                 replace_fos.append((str(fos_id), move))
-
+    
     return replace_fos
 
 
@@ -195,10 +196,6 @@ for sdg_label, foses in processed_all_to_all_fos.items():
 """
     Replacing 1_replace/ FOS
 """
-with open('sdgfostest.json', 'r') as f: sdg_fos = json.load(f)
-for s, fs in sdg_fos.items():
-    sdg_fos[s] = set(fs)
-
 data_replaced_fos = {'fos_id': [], 'fos_name': [], 'from_sdg': [], 'to_sdg': []}
 processed_replace_fos = process_replace_fos()
 for fos_id, move in processed_replace_fos:
@@ -214,6 +211,7 @@ for fos_id, move in processed_replace_fos:
     data_replaced_fos['fos_name'].append(fos_name)
     data_replaced_fos['from_sdg'].append(from_sdg)
     data_replaced_fos['to_sdg'].append(to_sdg)
+
 
 df_replaced = pd.DataFrame(data_replaced_fos)
 df_replaced.to_excel('raw_data/1_replace/ReplacedFOS.xlsx', index=False)
@@ -251,9 +249,6 @@ df_removed.to_excel('raw_data/2_remove/RemovedFOS.xlsx', index=False)
 """
 for sdg_label, fos_ids in sdg_fos.items():
     sdg_fos[sdg_label] = sorted(fos_ids)
-
-soil_in_ontology2 = '100474770' in sdg_fos['SDG_2']
-soil_in_ontology15 = '100474770' in sdg_fos['SDG_15']
 
 print("\n\t--- Final FOS Count ---")
 for sdg_label, foses in sdg_fos.items():

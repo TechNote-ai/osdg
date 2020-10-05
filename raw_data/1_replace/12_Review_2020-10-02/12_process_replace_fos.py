@@ -4,7 +4,7 @@ import json
 
 replace_fos = dict()
 
-df = pd.read_csv('replace-review_2020-09-02.csv')
+df = pd.read_csv('replace-review_2020-10-02.csv')
 for fos_id, _, from_sdg, to_sdg in df.values:
     fos_id = str(fos_id)
     if fos_id not in replace_fos.keys():
