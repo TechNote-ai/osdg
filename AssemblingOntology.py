@@ -195,10 +195,6 @@ for sdg_label, foses in processed_all_to_all_fos.items():
 """
     Replacing 1_replace/ FOS
 """
-for s, fs in sdg_fos.items():
-    sdg_fos[s] = list(fs)
-with open('sdgfostest.json', 'w') as f: json.dump(sdg_fos, f)
-
 with open('sdgfostest.json', 'r') as f: sdg_fos = json.load(f)
 for s, fs in sdg_fos.items():
     sdg_fos[s] = set(fs)
@@ -219,7 +215,7 @@ for fos_id, move in processed_replace_fos:
     data_replaced_fos['from_sdg'].append(from_sdg)
     data_replaced_fos['to_sdg'].append(to_sdg)
 
-df_replaced = pd.DataFrame(data_replaced_fos).sort_values(['from_sdg', 'to_sdg', 'fos_name'])
+df_replaced = pd.DataFrame(data_replaced_fos)
 df_replaced.to_excel('raw_data/1_replace/ReplacedFOS.xlsx', index=False)
 
 """
@@ -255,6 +251,9 @@ df_removed.to_excel('raw_data/2_remove/RemovedFOS.xlsx', index=False)
 """
 for sdg_label, fos_ids in sdg_fos.items():
     sdg_fos[sdg_label] = sorted(fos_ids)
+
+soil_in_ontology2 = '100474770' in sdg_fos['SDG_2']
+soil_in_ontology15 = '100474770' in sdg_fos['SDG_15']
 
 print("\n\t--- Final FOS Count ---")
 for sdg_label, foses in sdg_fos.items():
