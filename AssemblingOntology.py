@@ -195,6 +195,14 @@ for sdg_label, foses in processed_all_to_all_fos.items():
 """
     Replacing 1_replace/ FOS
 """
+for s, fs in sdg_fos.items():
+    sdg_fos[s] = list(fs)
+with open('sdgfostest.json', 'w') as f: json.dump(sdg_fos, f)
+
+with open('sdgfostest.json', 'r') as f: sdg_fos = json.load(f)
+for s, fs in sdg_fos.items():
+    sdg_fos[s] = set(fs)
+
 data_replaced_fos = {'fos_id': [], 'fos_name': [], 'from_sdg': [], 'to_sdg': []}
 processed_replace_fos = process_replace_fos()
 for fos_id, move in processed_replace_fos:
