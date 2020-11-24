@@ -70,4 +70,4 @@ response = requests.post('http://localhost:5000/search', data=data)
 print( response.text )
 ```
 
-If you are having trouble with any of the following steps, please contact our team at [osdg@technote.ai](mailto:osdg@technote.ai).
+If you are having trouble with any of the following steps, please contact our team at [info@osdg.ai](mailto:info@osdg.ai).
