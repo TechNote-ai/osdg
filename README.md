@@ -1,6 +1,9 @@
 <img src="/images/OSDG_new.png" alt="OSDG_Logo" width="200"/>
 
-OSDG is an open-source tool that assigns labels to scientific content based on Sustainable Development Goals (SDGs).
+# NB! From January, 2021 OSDG will be moved to a new repository (https://github.com/osdg-ai/osdg-tool). 
+**All the updates will be made to the new repo only!**
+
+OSDG is an open-source tool that assigns labels to scientific content based on Sustainable Development Goals (SDGs). 
 
 A version of the OSDG tool is available at [OSDG website](https://www.osdg.ai). There user can classify publications by inputting:
 1) a single DOI,
